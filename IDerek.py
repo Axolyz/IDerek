@@ -5,10 +5,6 @@
 # @Last Modified by   : Li Baoyan
 # @Last Modified time : 2020-01-03 19:19:53
 
-# V1.1 改进算法以支持OCR排版，完善了部分提示
-# V1.2 改进了查错流程
-# V1.3 语言统一化，扁平化，新logo，改进code style
-
 import time
 import tkinter as tk
 from tkinter import messagebox
@@ -17,7 +13,7 @@ from urllib import parse
 import requests
 from bs4 import BeautifulSoup
 
-version = "1.3"
+VERSION = "1.3"
 word_nums = []
 disposable_widgets = []
 
@@ -53,7 +49,7 @@ def change_interface(interface):
 
 
 def search_html(idiom):
-    # 输入成语输出搜索结果页面html
+    """输入成语输出搜索结果页面html"""
     url = "https://hanyu.baidu.com/s?wd=" + str(idiom) + "&ptype=zici"
     url = parse.quote(url, safe="/:?=")
     response = requests.get(url)
@@ -195,7 +191,7 @@ def main_interface():
     global window, t, i1, i2, i3
 
     window = tk.Tk()
-    window.title("IDerek V{}".format(version))
+    window.title("IDerek V{}".format(VERSION))
     w, h = window.maxsize()
     window.geometry("{}x{}".format(w, h))
 
@@ -212,7 +208,7 @@ def main_interface():
             2,
             lambda: exec(
                 """
-messagebox.showinfo('', '感谢使用IDerek V{}。若您在使用过程中有不遂意之处，请把反馈信息发到邮箱792405142@qq.com，我将不遗余力满足您的需求。'.format(version),)
+messagebox.showinfo('', '感谢使用IDerek V{}。反馈请发送至邮箱792405142@qq.com或github@This-username-is-available。'.format(VERSION),)
 window.destroy()
 """
             ),
@@ -277,7 +273,7 @@ else:
         [
             "Label",
             window,
-            "在上面的输入框内输入字数类型，比如我的成语里有四，六，八字成语，那就分三次输入，每次只输入一个纯数字——比如‘4’，然后记！得！按！下！按！钮！！若有其他字数类型请继续输入。输完所有字数类型后再进行下一环节。",
+            "在上面的输入框内输入字数类型，例如成语里有四，六，八字成语，那就分三次输入，每次只输入一个纯数字——比如‘4’，然后记！得！按！下！按！钮！！若有其他字数类型请继续输入。输完所有字数类型后再进行下一环节。",
             120,
             8,
         ],
@@ -289,8 +285,8 @@ else:
         """欢迎使用IDerek V{}。
 请确定有网络连接。
 请从现在开始认真留意下方提示框中的每一个字！！
-若您在使用过程中有不遂意之处，请把反馈信息发到邮箱792405142@qq.com，我将不遗余力满足您的需求。""".format(
-            version
+反馈请发送至邮箱792405142@qq.com或github@This-username-is-available。""".format(
+            VERSION
         ),
     )
     window.mainloop()

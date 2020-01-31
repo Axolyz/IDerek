@@ -4,20 +4,17 @@
 # @Last Modified by   : Li Baoyan
 # @Last Modified time : 2020-01-03 19:19:53
 
-# V1.1 改进算法以支持OCR排版，完善了部分提示
-# V1.2 改进了查错流程
-# V1.3 语言统一化，扁平化，新logo，改进code style
-
 import sys
 import time
 import Tkinter as tk
-import tkMessageBox as messagebox
 import urllib
 
 import requests
 from bs4 import BeautifulSoup
 
-version = "1.3"
+import tkMessageBox as messagebox
+
+VERSION = "1.3"
 word_nums = []
 disposable_widgets = []
 
@@ -25,12 +22,9 @@ disposable_widgets = []
 def pack_it(a):
     """一次性打包"""
     if a[0] == "Label":
-        c = tk.Label(a[1],
-                     text=a[2],
-                     width=a[3],
-                     height=a[4],
-                     wraplength=800,
-                     justify="left")
+        c = tk.Label(
+            a[1], text=a[2], width=a[3], height=a[4], wraplength=800, justify="left"
+        )
         c.pack()
         disposable_widgets.append(c)
     elif a[0] == "Button":
@@ -56,7 +50,7 @@ def change_interface(interface):
 
 
 def search_html(idiom):
-    # 输入成语输出搜索结果页面html
+    """输入成语输出搜索结果页面html"""
     url = "https://hanyu.baidu.com/s?wd=" + str(idiom) + "&ptype=zici"
     url = urllib.quote(url, safe="/:?=")
     response = requests.get(url)
@@ -91,8 +85,10 @@ def fmt(input_text):
 
 def mark_error(idiom):
     """输入成语，只标记有误成语"""
-    if (len(idiom) not in word_nums
-            or search_html(idiom).find("抱歉：百度汉语中没有收录相关结果。") != -1):
+    if (
+        len(idiom) not in word_nums
+        or search_html(idiom).find("抱歉：百度汉语中没有收录相关结果。") != -1
+    ):
         return "██" + idiom
     else:
         return idiom
@@ -147,15 +143,19 @@ def idiom_define():
 
     for idiom in idioms:
         input_idiom_html = search_html(idiom)
-        have_content = input_idiom_html.find(
-            '<div class="tab-content">')  # 是否有词条
+        have_content = input_idiom_html.find('<div class="tab-content">')  # 是否有词条
 
         if have_content != -1:
-            a = (BeautifulSoup(
-                input_idiom_html,
-                "lxml").find(class_="tab-content").find_all(name="p"))
-            idiom_definition = ("".join([x.contents[0].string for x in a
-                                         ]).replace(" ", "").replace("\n", ""))
+            a = (
+                BeautifulSoup(input_idiom_html, "lxml")
+                .find(class_="tab-content")
+                .find_all(name="p")
+            )
+            idiom_definition = (
+                "".join([x.contents[0].string for x in a])
+                .replace(" ", "")
+                .replace("\n", "")
+            )
         else:
             idiom_definition = "████"  # 错误码
 
@@ -168,14 +168,22 @@ def idiom_define():
         content = all_idiom_file.read().decode("gbk")
         all_idiom_file.seek(0, 0)
         all_idiom_file.write(
-            str(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())) + "\n" +
-            output_idiom_text + "\n\n" + content.encode("utf-8"))
+            str(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
+            + "\n"
+            + output_idiom_text
+            + "\n\n"
+            + content.encode("utf-8")
+        )
     with open(u"释义总集.txt", "r+") as all_definition_file:
         content = all_definition_file.read().decode("gbk")
         all_definition_file.seek(0, 0)
         all_definition_file.write(
-            str(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())) + "\n" +
-            output_idiom_definition_text + "\n\n" + content.encode('utf-8'))
+            str(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
+            + "\n"
+            + output_idiom_definition_text
+            + "\n\n"
+            + content.encode("utf-8")
+        )
 
     messagebox.showinfo("", "释义查询已完成。成语已自动追加至成语总集.txt中。释义已自动追加至释义总集.txt中。")
 
@@ -198,8 +206,9 @@ def f2():
 def f3():
     messagebox.showinfo(
         "",
-        "感谢使用IDerek V{}。若您在使用过程中有不遂意之处，请把反馈信息发到邮箱792405142@qq.com，我将不遗余力满足您的需求。"
-        .format(version),
+        "感谢使用IDerek V{}。反馈请发送至邮箱792405142@qq.com或github@This-username-is-available。".format(
+            VERSION
+        ),
     )
     window.destroy()
 
@@ -211,7 +220,7 @@ def main_interface():
     sys.setdefaultencoding("utf-8")
 
     window = tk.Tk()
-    window.title("IDerek V{}".format(version))
+    window.title("IDerek V{}".format(VERSION))
     w, h = window.maxsize()
     window.geometry("{}x{}".format(w, h))
 
@@ -264,7 +273,9 @@ def main_interface():
         """欢迎使用IDerek V{}。
 请确定有网络连接。
 请从现在开始认真留意下方提示框中的每一个字！！
-若您在使用过程中有不遂意之处，请把反馈信息发到邮箱792405142@qq.com，我将不遗余力满足您的需求。""".format(version),
+反馈请发送至邮箱792405142@qq.com或github@This-username-is-available。""".format(
+            VERSION
+        ),
     )
     window.mainloop()
 
