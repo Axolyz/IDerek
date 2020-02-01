@@ -129,7 +129,7 @@ def error_check():
         messagebox.showinfo("", "查错已完成。无错误。可进行下一环节。")
 
 
-def idiom_define():
+def search_definition():
     messagebox.showinfo("", "释义查询中，请耐心等待……")
 
     idioms = []
@@ -138,7 +138,7 @@ def idiom_define():
     input_idiom_text = t.get("0.0", "end").replace("█", "")
 
     idioms = input_idiom_text.split()
-    output_idiom_text = "\n".join(idioms)  # 成语格式化输出
+    output_idiom_text = "\n".join(idioms) + "\n"
 
     for idiom in idioms:
         input_idiom_html = search_html(idiom)
@@ -163,24 +163,24 @@ def idiom_define():
     t.delete("1.0", "end")
     t.insert("1.0", output_idiom_definition_text)
 
-    with open("成语总集.txt", "r+") as all_idiom_file:
+    with open("成语总集.txt", "r+", encoding="gbk") as all_idiom_file:
         content = all_idiom_file.read()
         all_idiom_file.seek(0, 0)
         all_idiom_file.write(
             str(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
             + "\n"
             + output_idiom_text
-            + "\n\n"
+            + "\n"
             + content
         )
-    with open("释义总集.txt", "r+") as all_definition_file:
+    with open("释义总集.txt", "r+", encoding="gbk") as all_definition_file:
         content = all_definition_file.read()
         all_definition_file.seek(0, 0)
         all_definition_file.write(
             str(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
             + "\n"
             + output_idiom_definition_text
-            + "\n\n"
+            + "\n"
             + content
         )
 
@@ -199,7 +199,7 @@ def main_interface():
     t.pack()
 
     i3 = [
-        ["Button", window, "查询释义并输出", 20, 2, idiom_define],
+        ["Button", window, "查询释义并输出", 20, 2, search_definition],
         [
             "Button",
             window,
