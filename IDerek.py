@@ -6,8 +6,9 @@
 # @Last Modified time : 2020-01-03 19:19:53
 
 import time
+import threading
 import tkinter as tk
-from tkinter import messagebox
+from tkinter import messagebox, StringVar
 from urllib import parse
 
 import requests
@@ -18,24 +19,28 @@ word_nums = []
 disposable_widgets = []
 
 
-def pack_it(a):
+def pack_it(foo):
     """一次性打包"""
-    if a[0] == "Label":
-        c = tk.Label(
-            a[1], text=a[2], width=a[3], height=a[4], wraplength=800, justify="left"
+    if foo[0] == "Label":
+        bar = tk.Label(
+            foo[1],
+            text=foo[2],
+            width=foo[3],
+            height=foo[4],
+            wraplength=800,
+            justify="left",
         )
-        c.pack()
-        disposable_widgets.append(c)
-    elif a[0] == "Button":
-        c = tk.Button(a[1], text=a[2], width=a[3], height=a[4], command=a[5])
-        c.pack()
-        disposable_widgets.append(c)
-    elif a[0] == "Toplevel":
-        c = tk.Toplevel()
-        c.geometry(a[1])
+        bar.pack()
+        disposable_widgets.append(bar)
+    elif foo[0] == "Button":
+        bar = tk.Button(
+            foo[1], text=foo[2], width=foo[3], height=foo[4], command=foo[5]
+        )
+        bar.pack()
+        disposable_widgets.append(bar)
     else:
         messagebox.showinfo("", "Oops")
-    return c
+    return bar
 
 
 def change_interface(interface):
@@ -94,6 +99,7 @@ def mark_error(idiom):
 
 
 def input_word_num():
+
     num = t.get("0.0", "end").replace("\n", "")
     t.delete("1.0", "end")
 
@@ -108,15 +114,38 @@ def input_word_num():
 
 
 def error_check():
-    messagebox.showinfo("", "查错中，请耐心等待……")
 
+    global foo
+
+    start = time.time()
     idioms = []
     output_idiom_text = ""
+    count = 0
 
     input_idiom_text = t.get("0.0", "end").replace("█", "")
 
     idioms = keep_chinese(input_idiom_text).split()
-    output_idiom_text = "\n".join([mark_error(x) for x in idioms])  # 成语格式化输出
+    all_count = len(idioms)
+
+    for idiom in idioms:
+        output_idiom_text += mark_error(idiom) + "\n"  # 成语格式化输出
+
+        now = time.time()
+        count += 1
+        un_count = all_count - count
+        al_time = now - start
+        speed = count / al_time
+        ex_time = un_count / speed
+
+        foo.set(
+            "预计剩余时间：{}s\n完成度：{}%\n速度：{}个/s".format(
+                str(round(ex_time, 2)),
+                str(round(count / all_count * 100, 2)),
+                str(round(speed, 2)),
+            )
+        )
+
+    top.destroy()
 
     t.delete("1.0", "end")
     t.insert("1.0", output_idiom_text)
@@ -130,14 +159,18 @@ def error_check():
 
 
 def search_definition():
-    messagebox.showinfo("", "释义查询中，请耐心等待……")
 
+    global foo, top
+
+    start = time.time()
     idioms = []
     output_idiom_definition_text = ""
+    count = 0
 
     input_idiom_text = t.get("0.0", "end").replace("█", "")
 
     idioms = input_idiom_text.split()
+    all_count = len(idioms)
     output_idiom_text = "\n".join(idioms) + "\n"
 
     for idiom in idioms:
@@ -145,13 +178,13 @@ def search_definition():
         have_content = input_idiom_html.find('<div class="tab-content">')  # 是否有词条
 
         if have_content != -1:
-            a = (
+            bar = (
                 BeautifulSoup(input_idiom_html, "lxml")
                 .find(class_="tab-content")
                 .find_all(name="p")
             )
             idiom_definition = (
-                "".join([x.contents[0].string for x in a])
+                "".join([foo.contents[0].string for foo in bar])
                 .replace(" ", "")
                 .replace("\n", "")
             )
@@ -159,6 +192,23 @@ def search_definition():
             idiom_definition = "████"  # 错误码
 
         output_idiom_definition_text += idiom + "：" + idiom_definition + "\n"
+
+        now = time.time()
+        count += 1
+        un_count = all_count - count
+        al_time = now - start
+        speed = count / al_time
+        ex_time = un_count / speed
+
+        foo.set(
+            "预计剩余时间：{}s\n完成度：{}%\n速度：{}个/s".format(
+                str(round(ex_time, 2)),
+                str(round(count / all_count * 100, 2)),
+                str(round(speed, 2)),
+            )
+        )
+
+    top.destroy()
 
     t.delete("1.0", "end")
     t.insert("1.0", output_idiom_definition_text)
@@ -199,7 +249,30 @@ def main_interface():
     t.pack()
 
     i3 = [
-        ["Button", window, "查询释义并输出", 20, 2, search_definition],
+        [
+            "Button",
+            window,
+            "查询释义并输出",
+            20,
+            2,
+            lambda: exec(
+                """
+global foo,top
+
+messagebox.showinfo("", "释义查询中，请耐心等待……")
+
+foo=StringVar()
+foo.set("完成度：0%")
+
+top=tk.Toplevel()
+tk.Label(top,text="请勿关闭此窗口。",width=20,height=1).pack()
+tk.Label(top,textvariable=foo,width=20,height=3).pack()
+
+th1=threading.Thread(target=search_definition)
+th1.start()
+"""
+            ),
+        ],
         [
             "Button",
             window,
@@ -224,7 +297,30 @@ window.destroy()
         ],
     ]
     i2 = [
-        ["Button", window, "格式化，查错并标记", 20, 2, error_check],
+        [
+            "Button",
+            window,
+            "格式化，查错并标记",
+            20,
+            2,
+            lambda: exec(
+                """
+global foo,top
+
+messagebox.showinfo("", "查词中，请耐心等待……")
+
+foo=StringVar()
+foo.set("完成度：0%")
+
+top=tk.Toplevel()
+tk.Label(top,text="请勿关闭此窗口。",width=20,height=1).pack()
+tk.Label(top,textvariable=foo,width=20,height=3).pack()
+
+th1=threading.Thread(target=error_check)
+th1.start()
+"""
+            ),
+        ],
         [
             "Button",
             window,
@@ -235,8 +331,10 @@ window.destroy()
                 """
 input_idiom_text = t.get("0.0", "end").replace("█", "")
 output_text = fmt(input_idiom_text)
+
 t.delete("1.0", "end")
 t.insert("1.0", output_text)
+
 change_interface(i3)
 """
             ),
