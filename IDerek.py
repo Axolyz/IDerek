@@ -5,14 +5,14 @@
 # @Last Modified by   : Li Baoyan
 # @Last Modified time : 2020-01-03 19:19:53
 
-import time
 import threading
-import tkinter as tk
-from tkinter import messagebox, StringVar
-from urllib import parse
+import time
+import tkinter
+import tkinter.messagebox
+import urllib.parse
 
+import bs4
 import requests
-from bs4 import BeautifulSoup
 
 VERSION = "1.3"
 word_nums = []
@@ -22,7 +22,7 @@ disposable_widgets = []
 def pack_it(foo):
     """一次性打包"""
     if foo[0] == "Label":
-        bar = tk.Label(
+        bar = tkinter.Label(
             foo[1],
             text=foo[2],
             width=foo[3],
@@ -33,13 +33,13 @@ def pack_it(foo):
         bar.pack()
         disposable_widgets.append(bar)
     elif foo[0] == "Button":
-        bar = tk.Button(
+        bar = tkinter.Button(
             foo[1], text=foo[2], width=foo[3], height=foo[4], command=foo[5]
         )
         bar.pack()
         disposable_widgets.append(bar)
     else:
-        messagebox.showinfo("", "Oops")
+        tkinter.messagebox.showinfo("", "Oops")
     return bar
 
 
@@ -56,7 +56,7 @@ def change_interface(interface):
 def search_html(idiom):
     """输入成语输出搜索结果页面html"""
     url = "https://hanyu.baidu.com/s?wd=" + str(idiom) + "&ptype=zici"
-    url = parse.quote(url, safe="/:?=")
+    url = urllib.parse.quote(url, safe="/:?=")
     response = requests.get(url)
     idiomhtml = response.text
     return idiomhtml
@@ -105,17 +105,17 @@ def input_word_num():
 
     try:
         word_nums.append(int(num))
-        messagebox.showinfo("", "输入成功。")
+        tkinter.messagebox.showinfo("", "输入成功。")
     except ValueError:
         if num == "":
-            messagebox.showinfo("", "请在输入框内输入字数类型。")
+            tkinter.messagebox.showinfo("", "请在输入框内输入字数类型。")
         else:
-            messagebox.showinfo("", "请输入合法指令！！")
+            tkinter.messagebox.showinfo("", "请输入合法指令！！")
 
 
 def error_check():
 
-    global foo
+    global progress
 
     start = time.time()
     idioms = []
@@ -137,7 +137,7 @@ def error_check():
         speed = count / al_time
         ex_time = un_count / speed
 
-        foo.set(
+        progress.set(
             "预计剩余时间：{}s\n完成度：{}%\n速度：{}个/s".format(
                 str(round(ex_time, 2)),
                 str(round(count / all_count * 100, 2)),
@@ -151,16 +151,16 @@ def error_check():
     t.insert("1.0", output_idiom_text)
 
     if output_idiom_text == "":
-        messagebox.showinfo("", "请将待查错的成语单OCR（图片转文字）结果置于以上输入框内。")
+        tkinter.messagebox.showinfo("", "请将待查错的成语单OCR（图片转文字）结果置于以上输入框内。")
     elif output_idiom_text.find("█") != -1:
-        messagebox.showinfo("", "查错已完成。请修改已标记成语的错误。")
+        tkinter.messagebox.showinfo("", "查错已完成。请修改已标记成语的错误。")
     else:
-        messagebox.showinfo("", "查错已完成。无错误。可进行下一环节。")
+        tkinter.messagebox.showinfo("", "查错已完成。无错误。可进行下一环节。")
 
 
 def search_definition():
 
-    global foo, top
+    global progress, top
 
     start = time.time()
     idioms = []
@@ -179,7 +179,7 @@ def search_definition():
 
         if have_content != -1:
             bar = (
-                BeautifulSoup(input_idiom_html, "lxml")
+                bs4.BeautifulSoup(input_idiom_html, "lxml")
                 .find(class_="tab-content")
                 .find_all(name="p")
             )
@@ -200,7 +200,7 @@ def search_definition():
         speed = count / al_time
         ex_time = un_count / speed
 
-        foo.set(
+        progress.set(
             "预计剩余时间：{}s\n完成度：{}%\n速度：{}个/s".format(
                 str(round(ex_time, 2)),
                 str(round(count / all_count * 100, 2)),
@@ -234,62 +234,63 @@ def search_definition():
             + content
         )
 
-    messagebox.showinfo("", "释义查询已完成。成语已自动追加至成语总集.txt中。释义已自动追加至释义总集.txt中。")
+    tkinter.messagebox.showinfo("", "释义查询已完成。成语已自动追加至成语总集.txt中。释义已自动追加至释义总集.txt中。")
 
 
-def main_interface():
-    global window, t, i1, i2, i3
+def main():
 
-    window = tk.Tk()
-    window.title("IDerek V{}".format(VERSION))
-    w, h = window.maxsize()
-    window.geometry("{}x{}".format(w, h))
+    global root, t, i1, i2, i3
 
-    t = tk.Text(window, height=30)
+    root = tkinter.Tk()
+    root.title("IDerek V{}".format(VERSION))
+    w, h = root.maxsize()
+    root.geometry("{}x{}".format(w, h))
+
+    t = tkinter.Text(root, height=25)
     t.pack()
 
     i3 = [
         [
             "Button",
-            window,
+            root,
             "查询释义并输出",
             20,
             2,
             lambda: exec(
                 """
-global foo,top
+global progress, top
 
-messagebox.showinfo("", "释义查询中，请耐心等待……")
+tkinter.messagebox.showinfo("", "释义查询中，请耐心等待……")
 
-foo=StringVar()
-foo.set("完成度：0%")
+progress = tkinter.StringVar()
+progress.set("完成度：0%")
 
-top=tk.Toplevel()
-tk.Label(top,text="请勿关闭此窗口。",width=20,height=1).pack()
-tk.Label(top,textvariable=foo,width=20,height=3).pack()
+top = tkinter.Toplevel()
+tkinter.Label(top, text = "请勿关闭此窗口。", width = 20, height = 1).pack()
+tkinter.Label(top, textvariable = progress, width = 20, height = 3).pack()
 
-th1=threading.Thread(target=search_definition)
+th1 = threading.Thread(target = search_definition)
 th1.start()
 """
             ),
         ],
         [
             "Button",
-            window,
+            root,
             "完成",
             20,
             2,
             lambda: exec(
                 """
-messagebox.showinfo('', '感谢使用IDerek V{}。反馈请发送至邮箱792405142@qq.com或github@This-username-is-available。'.format(VERSION),)
-window.destroy()
+tkinter.messagebox.showinfo('', '感谢使用IDerek V{}。反馈请发送至邮箱792405142@qq.com或github@This-username-is-available。'.format(VERSION),)
+root.destroy()
 """
             ),
         ],
         [
             "Label",
-            window,
-            """查询释义会将每行的成语后追加上该成语的释义，中途会伪卡死且没有任何提醒，请耐心等待。查询速度约为0.5s至5s一个成语不等，太慢的话请重启电脑再重试。
+            root,
+            """查询释义会将每行的成语后追加上该成语的释义。查询速度约为0.5s至5s一个成语不等，太慢的话请重启电脑再重试。
 “████”表示查询不到对应成语释义。
 输入框不支持右键菜单，请善用ctrl+c复制和ctrl+v粘贴。""",
             120,
@@ -299,31 +300,31 @@ window.destroy()
     i2 = [
         [
             "Button",
-            window,
+            root,
             "格式化，查错并标记",
             20,
             2,
             lambda: exec(
                 """
-global foo,top
+global progress, top
 
-messagebox.showinfo("", "查词中，请耐心等待……")
+tkinter.messagebox.showinfo("", "查错中，请耐心等待……")
 
-foo=StringVar()
-foo.set("完成度：0%")
+progress = tkinter.StringVar()
+progress.set("完成度：0%")
 
-top=tk.Toplevel()
-tk.Label(top,text="请勿关闭此窗口。",width=20,height=1).pack()
-tk.Label(top,textvariable=foo,width=20,height=3).pack()
+top = tkinter.Toplevel()
+tkinter.Label(top, text = "请勿关闭此窗口。", width = 20, height = 1).pack()
+tkinter.Label(top, textvariable = progress, width = 20, height = 3).pack()
 
-th1=threading.Thread(target=error_check)
+th1 = threading.Thread(target = error_check)
 th1.start()
 """
             ),
         ],
         [
             "Button",
-            window,
+            root,
             "下一环节",
             20,
             2,
@@ -341,9 +342,9 @@ change_interface(i3)
         ],
         [
             "Label",
-            window,
+            root,
             """请将待查错的成语单OCR（图片转文字）结果置于以上输入框内，不需改格式。输入框不支持右键菜单，请善用ctrl+c复制和ctrl+v粘贴。
-查错会将原来杂乱的文本自动格式化为每行一个成语的标准格式并用“██”标记错误的成语，中途会伪卡死且没有任何提醒，请耐心等待。查错速度约为0.5s至5s一个成语不等，实在太慢的话请重启电脑再重试。
+查错会将原来杂乱的文本自动格式化为每行一个成语的标准格式并用“██”标记错误的成语。查错速度约为0.5s至5s一个成语不等，实在太慢的话请重启电脑再重试。
 有标记的成语需手工改错，改错时更正汉字的错误即可，“██”不用删，也无需删空行和空格。但要保证每行至多有一个成语。中间有标点的成语应把标点去掉。
 手工改错后可以直接下一环节，对自己不放心的还可以再次点击查错检查一遍。
 若有某些“█”误标记，很可能是上一步的字数类型输入错误，如果不是请直接进行下一环节。""",
@@ -352,25 +353,25 @@ change_interface(i3)
         ],
     ]
     i1 = [
-        ["Button", window, "点击以输入字数类型", 20, 2, input_word_num],
+        ["Button", root, "点击以输入字数类型", 20, 2, input_word_num],
         [
             "Button",
-            window,
+            root,
             "下一环节",
             20,
             2,
             lambda: exec(
                 """
-if word_nums!=[]:
+if word_nums != []:
     change_interface(i2)
 else:
-    messagebox.showinfo("", "未输入字数类型！！")
+    tkinter.messagebox.showinfo("", "未输入字数类型！！")
 """
             ),
         ],
         [
             "Label",
-            window,
+            root,
             "在上面的输入框内输入字数类型，例如成语里有四，六，八字成语，那就分三次输入，每次只输入一个纯数字——比如‘4’，然后记！得！按！下！按！钮！！若有其他字数类型请继续输入。输完所有字数类型后再进行下一环节。",
             120,
             8,
@@ -378,7 +379,7 @@ else:
     ]
 
     change_interface(i1)
-    messagebox.showinfo(
+    tkinter.messagebox.showinfo(
         "",
         """欢迎使用IDerek V{}。
 请确定有网络连接。
@@ -387,7 +388,7 @@ else:
             VERSION
         ),
     )
-    window.mainloop()
+    root.mainloop()
 
 
-main_interface()
+main()
