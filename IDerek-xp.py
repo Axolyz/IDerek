@@ -14,7 +14,6 @@ from bs4 import BeautifulSoup
 
 import tkMessageBox as messagebox
 
-VERSION = "1.3"
 word_nums = []
 disposable_widgets = []
 
@@ -168,21 +167,25 @@ def search_definition():
         content = all_idiom_file.read().decode("gbk")
         all_idiom_file.seek(0, 0)
         all_idiom_file.write(
-            str(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
-            + "\n"
-            + output_idiom_text
-            + "\n"
-            + content.encode("gbk")
+            (
+                str(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
+                + "\n"
+                + output_idiom_text
+                + "\n"
+                + content
+            ).encode("gbk")
         )
     with open(u"释义总集.txt", "r+") as all_definition_file:
         content = all_definition_file.read().decode("gbk")
         all_definition_file.seek(0, 0)
         all_definition_file.write(
-            str(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
-            + "\n"
-            + output_idiom_definition_text
-            + "\n"
-            + content.encode("gbk")
+            (
+                str(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
+                + "\n"
+                + output_idiom_definition_text
+                + "\n"
+                + content
+            ).encode("gbk")
         )
 
     messagebox.showinfo("", "释义查询已完成。成语已自动追加至成语总集.txt中。释义已自动追加至释义总集.txt中。")
@@ -205,11 +208,8 @@ def f2():
 
 def f3():
     messagebox.showinfo(
-        "",
-        "感谢使用IDerek V{}。反馈请发送至邮箱792405142@qq.com或github@This-username-is-available。".format(
-            VERSION
-        ),
-    )
+        "", "感谢使用IDerek。反馈请发送至邮箱792405142@qq.com或github@This-username-is-available。"
+    ),
     window.destroy()
 
 
@@ -220,7 +220,7 @@ def main_interface():
     sys.setdefaultencoding("utf-8")
 
     window = tk.Tk()
-    window.title("IDerek V{}".format(VERSION))
+    window.title("IDerek")
     w, h = window.maxsize()
     window.geometry("{}x{}".format(w, h))
 
@@ -270,12 +270,10 @@ def main_interface():
     change_interface(i1)
     messagebox.showinfo(
         "",
-        """欢迎使用IDerek V{}。
+        """欢迎使用IDerek。
 请确定有网络连接。
 请从现在开始认真留意下方提示框中的每一个字！！
-反馈请发送至邮箱792405142@qq.com或github@This-username-is-available。""".format(
-            VERSION
-        ),
+反馈请发送至邮箱792405142@qq.com或github@This-username-is-available。""",
     )
     window.mainloop()
 
