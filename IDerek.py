@@ -14,9 +14,12 @@ import urllib.parse
 import bs4
 import requests
 
-VERSION = "1.3"
 word_nums = []
 disposable_widgets = []
+special_words = {
+    b"\xe4\xb8\x80\xe7\x8f\xad\xe9\x9c\xb8\xe6\xb0\x94": b"\xe6\xb0\xb8\xe4\xb9\x85\xe6\xb5\x81\xe4\xbc\xa0",
+    b"\xe9\xaa\x8c\xe8\xaf\x81\xe9\x97\xae\xe9\xa2\x98\xe7\xad\x94\xe6\xa1\x88": b"[0]",
+}
 
 
 def pack_it(foo):
@@ -43,7 +46,7 @@ def pack_it(foo):
     return bar
 
 
-def change_interface(interface):
+def change_disposable_widget(interface):
     """一次性控件转场"""
     global disposable_widgets
     for widgets in disposable_widgets:
@@ -58,24 +61,16 @@ def search_html(idiom):
     url = "https://hanyu.baidu.com/s?wd=" + str(idiom) + "&ptype=zici"
     url = urllib.parse.quote(url, safe="/:?=")
     response = requests.get(url)
-    idiomhtml = response.text
-    return idiomhtml
-
-
-def is_chinese(uchar):
-    """判断一个unicode是否是汉字"""
-    if uchar >= u"\u4e00" and uchar <= u"\u9fa5":
-        return True
-    else:
-        return False
+    idiom_html = response.text
+    return idiom_html
 
 
 def keep_chinese(content):
     """输入文本，保留所有中文字符，非中文字符变成空格"""
     contentstr = ""
-    for str in content:
-        if is_chinese(str):
-            contentstr = contentstr + str
+    for char in content:
+        if char >= u"\u4e00" and char <= u"\u9fa5":
+            contentstr += char
         else:
             contentstr = contentstr + " "
     return contentstr
@@ -87,20 +82,9 @@ def fmt(input_text):
     return output_text
 
 
-def mark_error(idiom):
-    """输入成语，只标记有误成语"""
-    if (
-        len(idiom) not in word_nums
-        or search_html(idiom).find("抱歉：百度汉语中没有收录相关结果。") != -1
-    ):
-        return "██" + idiom
-    else:
-        return idiom
-
-
 def input_word_num():
 
-    num = t.get("0.0", "end").replace("\n", "")
+    num = t.get("0.0", "end")
     t.delete("1.0", "end")
 
     try:
@@ -110,7 +94,7 @@ def input_word_num():
         if num == "":
             tkinter.messagebox.showinfo("", "请在输入框内输入字数类型。")
         else:
-            tkinter.messagebox.showinfo("", "请输入合法指令！！")
+            tkinter.messagebox.showinfo("", "请输入纯数字！！")
 
 
 def error_check():
@@ -119,28 +103,38 @@ def error_check():
 
     start = time.time()
     idioms = []
-    output_idiom_text = ""
-    count = 0
+    all_output_idiom = ""
+    searched_count = 0
 
-    input_idiom_text = t.get("0.0", "end").replace("█", "")
+    all_input_idiom = t.get("0.0", "end").replace("█", "")
 
-    idioms = keep_chinese(input_idiom_text).split()
+    idioms = keep_chinese(all_input_idiom).split()
     all_count = len(idioms)
 
     for idiom in idioms:
-        output_idiom_text += mark_error(idiom) + "\n"  # 成语格式化输出
+        if idiom in [x.decode() for x in list(special_words)]:
+            output_idiom = idiom
+        elif (
+            len(idiom) not in word_nums
+            or search_html(idiom).find("抱歉：百度汉语中没有收录相关结果。") != -1
+        ):
+            output_idiom = "██" + idiom
+        else:
+            output_idiom = idiom
+
+        all_output_idiom += output_idiom + "\n"
 
         now = time.time()
-        count += 1
-        un_count = all_count - count
-        al_time = now - start
-        speed = count / al_time
-        ex_time = un_count / speed
+        searched_count += 1
+        unsearched_count = all_count - searched_count
+        used_time = now - start
+        speed = searched_count / used_time
+        rest_time = unsearched_count / speed
 
         progress.set(
             "预计剩余时间：{}s\n完成度：{}%\n速度：{}个/s".format(
-                str(round(ex_time, 2)),
-                str(round(count / all_count * 100, 2)),
+                str(round(rest_time, 2)),
+                str(round(searched_count / all_count * 100, 2)),
                 str(round(speed, 2)),
             )
         )
@@ -148,11 +142,11 @@ def error_check():
     top.destroy()
 
     t.delete("1.0", "end")
-    t.insert("1.0", output_idiom_text)
+    t.insert("1.0", all_output_idiom)
 
-    if output_idiom_text == "":
+    if all_output_idiom == "":
         tkinter.messagebox.showinfo("", "请将待查错的成语单OCR（图片转文字）结果置于以上输入框内。")
-    elif output_idiom_text.find("█") != -1:
+    elif all_output_idiom.find("█") != -1:
         tkinter.messagebox.showinfo("", "查错已完成。请修改已标记成语的错误。")
     else:
         tkinter.messagebox.showinfo("", "查错已完成。无错误。可进行下一环节。")
@@ -164,46 +158,45 @@ def search_definition():
 
     start = time.time()
     idioms = []
-    output_idiom_definition_text = ""
-    count = 0
+    all_output_idiom_definition = ""
+    searched_count = 0
 
-    input_idiom_text = t.get("0.0", "end").replace("█", "")
+    all_input_idiom = t.get("0.0", "end").replace("█", "")
 
-    idioms = input_idiom_text.split()
+    idioms = all_input_idiom.split()
     all_count = len(idioms)
-    output_idiom_text = "\n".join(idioms) + "\n"
+    all_output_idiom = "\n".join(idioms) + "\n"
 
     for idiom in idioms:
-        input_idiom_html = search_html(idiom)
-        have_content = input_idiom_html.find('<div class="tab-content">')  # 是否有词条
-
-        if have_content != -1:
+        if search_html(idiom).find('<div class="tab-content">') != -1:
             bar = (
-                bs4.BeautifulSoup(input_idiom_html, "lxml")
+                bs4.BeautifulSoup(search_html(idiom), "lxml")
                 .find(class_="tab-content")
                 .find_all(name="p")
             )
-            idiom_definition = (
+            output_idiom_definition = (
                 "".join([foo.contents[0].string for foo in bar])
                 .replace(" ", "")
                 .replace("\n", "")
             )
+        elif idiom in [x.decode() for x in list(special_words)]:
+            output_idiom_definition = special_words[idiom.encode()].decode()
         else:
-            idiom_definition = "████"  # 错误码
+            output_idiom_definition = "████"  # 错误码
 
-        output_idiom_definition_text += idiom + "：" + idiom_definition + "\n"
+        all_output_idiom_definition += idiom + "：" + output_idiom_definition + "\n"
 
         now = time.time()
-        count += 1
-        un_count = all_count - count
-        al_time = now - start
-        speed = count / al_time
-        ex_time = un_count / speed
+        searched_count += 1
+        unsearched_count = all_count - searched_count
+        used_time = now - start
+        speed = searched_count / used_time
+        rest_time = unsearched_count / speed
 
         progress.set(
             "预计剩余时间：{}s\n完成度：{}%\n速度：{}个/s".format(
-                str(round(ex_time, 2)),
-                str(round(count / all_count * 100, 2)),
+                str(round(rest_time, 2)),
+                str(round(searched_count / all_count * 100, 2)),
                 str(round(speed, 2)),
             )
         )
@@ -211,7 +204,7 @@ def search_definition():
     top.destroy()
 
     t.delete("1.0", "end")
-    t.insert("1.0", output_idiom_definition_text)
+    t.insert("1.0", all_output_idiom_definition)
 
     with open("成语总集.txt", "r+", encoding="gbk") as all_idiom_file:
         content = all_idiom_file.read()
@@ -219,7 +212,7 @@ def search_definition():
         all_idiom_file.write(
             str(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
             + "\n"
-            + output_idiom_text
+            + all_output_idiom
             + "\n"
             + content
         )
@@ -229,7 +222,7 @@ def search_definition():
         all_definition_file.write(
             str(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
             + "\n"
-            + output_idiom_definition_text
+            + all_output_idiom_definition
             + "\n"
             + content
         )
@@ -241,8 +234,19 @@ def main():
 
     global root, t, i1, i2, i3
 
+    tk = tkinter.Tk()
+    tk.withdraw()
+    tkinter.messagebox.showinfo(
+        "",
+        """欢迎使用IDerek。
+请确定有网络连接。
+请从现在开始认真留意下方提示框中的每一个字！！
+反馈请发送至邮箱792405142@qq.com或github@This-username-is-available。""",
+    )
+    tk.destroy()
+
     root = tkinter.Tk()
-    root.title("IDerek V{}".format(VERSION))
+    root.title("IDerek")
     w, h = root.maxsize()
     root.geometry("{}x{}".format(w, h))
 
@@ -282,7 +286,7 @@ th1.start()
             2,
             lambda: exec(
                 """
-tkinter.messagebox.showinfo('', '感谢使用IDerek V{}。反馈请发送至邮箱792405142@qq.com或github@This-username-is-available。'.format(VERSION),)
+tkinter.messagebox.showinfo('', '感谢使用IDerek。反馈请发送至邮箱792405142@qq.com或github@This-username-is-available。',)
 root.destroy()
 """
             ),
@@ -297,6 +301,7 @@ root.destroy()
             8,
         ],
     ]
+
     i2 = [
         [
             "Button",
@@ -330,13 +335,13 @@ th1.start()
             2,
             lambda: exec(
                 """
-input_idiom_text = t.get("0.0", "end").replace("█", "")
-output_text = fmt(input_idiom_text)
+input_text = t.get("0.0", "end").replace("█", "")
+output_text = fmt(input_text)
 
 t.delete("1.0", "end")
 t.insert("1.0", output_text)
 
-change_interface(i3)
+change_disposable_widget(i3)
 """
             ),
         ],
@@ -352,6 +357,7 @@ change_interface(i3)
             8,
         ],
     ]
+
     i1 = [
         ["Button", root, "点击以输入字数类型", 20, 2, input_word_num],
         [
@@ -362,8 +368,10 @@ change_interface(i3)
             2,
             lambda: exec(
                 """
-if word_nums != []:
-    change_interface(i2)
+if t.get("0.0", "end").strip() != '':
+    tkinter.messagebox.showinfo("", "输入框内仍有待输入的字数类型，请先点击输入。")
+elif word_nums != []:
+    change_disposable_widget(i2)
 else:
     tkinter.messagebox.showinfo("", "未输入字数类型！！")
 """
@@ -372,22 +380,13 @@ else:
         [
             "Label",
             root,
-            "在上面的输入框内输入字数类型，例如成语里有四，六，八字成语，那就分三次输入，每次只输入一个纯数字——比如‘4’，然后记！得！按！下！按！钮！！若有其他字数类型请继续输入。输完所有字数类型后再进行下一环节。",
+            "输入字数类型会将输入框中的纯数字作为字数类型输入并清空输入框，例如成语里有四，六，八字成语，那就分三次输入，每次只输入一个纯数字——比如‘4’，然后记！得！按！下！按！钮！！若有其他字数类型请继续输入。输完所有字数类型后再进行下一环节。",
             120,
             8,
         ],
     ]
 
-    change_interface(i1)
-    tkinter.messagebox.showinfo(
-        "",
-        """欢迎使用IDerek V{}。
-请确定有网络连接。
-请从现在开始认真留意下方提示框中的每一个字！！
-反馈请发送至邮箱792405142@qq.com或github@This-username-is-available。""".format(
-            VERSION
-        ),
-    )
+    change_disposable_widget(i1)
     root.mainloop()
 
 
