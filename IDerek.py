@@ -23,7 +23,7 @@ special_words = {
 
 
 def pack_it(foo):
-    """一次性打包"""
+    """一次性控件打包"""
     if foo[0] == "Label":
         bar = tkinter.Label(
             foo[1],
@@ -57,7 +57,7 @@ def change_disposable_widget(interface):
 
 
 def search_html(idiom):
-    """输入成语输出搜索结果页面html"""
+    """输入成语，返回搜索结果页面html"""
     url = "https://hanyu.baidu.com/s?wd=" + str(idiom) + "&ptype=zici"
     url = urllib.parse.quote(url, safe="/:?=")
     response = requests.get(url)
@@ -66,7 +66,7 @@ def search_html(idiom):
 
 
 def keep_chinese(content):
-    """输入文本，保留所有中文字符，非中文字符变成空格"""
+    """输入文本，返回所有非中文字符变成空格的文本"""
     contentstr = ""
     for char in content:
         if char >= u"\u4e00" and char <= u"\u9fa5":
@@ -76,7 +76,7 @@ def keep_chinese(content):
     return contentstr
 
 
-def fmt(input_text):
+def fmt(input_text):  # 这个函数是为了避过\n在字符串中出现
     idiom = input_text.split()
     output_text = "\n".join(idiom)
     return output_text
@@ -235,7 +235,7 @@ def main():
     global root, t, i1, i2, i3
 
     tk = tkinter.Tk()
-    tk.withdraw()
+    tk.withdraw()  # 隐藏主窗口，实现只有一个弹窗弹出
     tkinter.messagebox.showinfo(
         "",
         """欢迎使用IDerek。
@@ -243,9 +243,9 @@ def main():
 请从现在开始认真留意下方提示框中的每一个字！！
 反馈请发送至邮箱792405142@qq.com或github@This-username-is-available。""",
     )
-    tk.destroy()
+    tk.destroy()  # 销毁假的主窗口
 
-    root = tkinter.Tk()
+    root = tkinter.Tk()  # 真的主窗口，这么做是为了防止主窗口失焦
     root.title("IDerek")
     w, h = root.maxsize()
     root.geometry("{}x{}".format(w, h))
