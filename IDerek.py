@@ -14,50 +14,46 @@ import urllib.parse
 import bs4
 import requests
 
-word_nums = []
-disposable_widgets = []
-special_words = {
-    b"\xe4\xb8\x80\xe7\x8f\xad\xe9\x9c\xb8\xe6\xb0\x94": b"\xe6\xb0\xb8\xe4\xb9\x85\xe6\xb5\x81\xe4\xbc\xa0",
-    b"\xe9\xaa\x8c\xe8\xaf\x81\xe9\x97\xae\xe9\xa2\x98\xe7\xad\x94\xe6\xa1\x88": b"[0]",
-}
 
-
-def pack_it(foo):
+def pack_disposable_widget(widget_args):
     """一次性控件打包"""
-    if foo[0] == "Label":
-        bar = tkinter.Label(
-            foo[1],
-            text=foo[2],
-            width=foo[3],
-            height=foo[4],
+    if widget_args[0] == "Label":
+        widget = tkinter.Label(
+            widget_args[1],
+            text=widget_args[2],
+            width=widget_args[3],
+            height=widget_args[4],
             wraplength=800,
             justify="left",
         )
-        bar.pack()
-        disposable_widgets.append(bar)
-    elif foo[0] == "Button":
-        bar = tkinter.Button(
-            foo[1], text=foo[2], width=foo[3], height=foo[4], command=foo[5]
+        widget.pack()
+        disposable_widgets.append(widget)
+    elif widget_args[0] == "Button":
+        widget = tkinter.Button(
+            widget_args[1],
+            text=widget_args[2],
+            width=widget_args[3],
+            height=widget_args[4],
+            command=widget_args[5],
         )
-        bar.pack()
-        disposable_widgets.append(bar)
+        widget.pack()
+        disposable_widgets.append(widget)
     else:
-        tkinter.messagebox.showinfo("", "Oops")
-    return bar
+        raise Exception('"pack_it()" does not support this widget.')
+    return widget
 
 
 def change_disposable_widget(interface):
     """一次性控件转场"""
-    global disposable_widgets
     for widgets in disposable_widgets:
         widgets.destroy()
-    disposable_widgets = []
+    disposable_widgets.clear()
     for widgets in interface:
-        pack_it(widgets)
+        pack_disposable_widget(widgets)
 
 
 def search_html(idiom):
-    """输入成语，返回搜索结果页面html"""
+    """输入成语，返回搜索结果页面html"""  # 最核心部分（然而很弱智
     url = "https://hanyu.baidu.com/s?wd=" + str(idiom) + "&ptype=zici"
     url = urllib.parse.quote(url, safe="/:?=")
     response = requests.get(url)
@@ -84,67 +80,74 @@ def fmt(input_text):  # 这个函数是为了避过\n在字符串中出现
 
 def input_word_num():
 
-    num = t.get("0.0", "end")
+    num = t.get("0.0", "end").strip()
     t.delete("1.0", "end")
 
     try:
         word_nums.append(int(num))
         tkinter.messagebox.showinfo("", "输入成功。")
     except ValueError:
-        if num == "":
+        if not num:
             tkinter.messagebox.showinfo("", "请在输入框内输入字数类型。")
         else:
             tkinter.messagebox.showinfo("", "请输入纯数字！！")
 
 
-def error_check():
+def to_error_check():
+    if t.get("0.0", "end").strip():
+        tkinter.messagebox.showinfo("", "输入框内仍有待输入的字数类型，请先点击输入。")
+    elif word_nums:
+        change_disposable_widget(i2)
+    else:
+        tkinter.messagebox.showinfo("", "未输入字数类型！！")
 
-    global progress
+
+def error_check_threading():
 
     start = time.time()
     idioms = []
     all_output_idiom = ""
     searched_count = 0
 
-    all_input_idiom = t.get("0.0", "end").replace("█", "")
+    all_input_idiom = t.get("0.0", "end")
 
     idioms = keep_chinese(all_input_idiom).split()
     all_count = len(idioms)
 
     for idiom in idioms:
-        if idiom in [x.decode() for x in list(special_words)]:
-            output_idiom = idiom
-        elif (
-            len(idiom) not in word_nums
-            or search_html(idiom).find("抱歉：百度汉语中没有收录相关结果。") != -1
+        if idiom in [x.decode() for x in list(special_words)] or (
+            len(idiom) in word_nums
+            and search_html(idiom).find("抱歉：百度汉语中没有收录相关结果。") == -1
         ):
-            output_idiom = "██" + idiom
-        else:
             output_idiom = idiom
+        else:
+            output_idiom = "██" + idiom
 
         all_output_idiom += output_idiom + "\n"
+        try:
+            now = time.time()
+            searched_count += 1
+            unsearched_count = all_count - searched_count
+            used_time = now - start
+            speed = searched_count / used_time
+            rest_time = unsearched_count / speed
 
-        now = time.time()
-        searched_count += 1
-        unsearched_count = all_count - searched_count
-        used_time = now - start
-        speed = searched_count / used_time
-        rest_time = unsearched_count / speed
-
-        progress.set(
-            "预计剩余时间：{}s\n完成度：{}%\n速度：{}个/s".format(
-                str(round(rest_time, 2)),
-                str(round(searched_count / all_count * 100, 2)),
-                str(round(speed, 2)),
+            progress.set(
+                "预计剩余时间：{}s\n完成度：{}%\n速度：{}个/s".format(
+                    str(round(rest_time, 2)),
+                    str(round(searched_count / all_count * 100, 2)),
+                    str(round(speed, 2)),
+                )
             )
-        )
+        except ZeroDivisionError:
+            searched_count += 1
 
     top.destroy()
 
     t.delete("1.0", "end")
     t.insert("1.0", all_output_idiom)
 
-    if all_output_idiom == "":
+    if not all_output_idiom:
         tkinter.messagebox.showinfo("", "请将待查错的成语单OCR（图片转文字）结果置于以上输入框内。")
     elif all_output_idiom.find("█") != -1:
         tkinter.messagebox.showinfo("", "查错已完成。请修改已标记成语的错误。")
@@ -152,9 +155,34 @@ def error_check():
         tkinter.messagebox.showinfo("", "查错已完成。无错误。可进行下一环节。")
 
 
-def search_definition():
+def error_check():
 
     global progress, top
+
+    tkinter.messagebox.showinfo("", "查错中，请耐心等待……")
+
+    progress = tkinter.StringVar()
+    progress.set("完成度：0%")
+
+    top = tkinter.Toplevel()
+    tkinter.Label(top, text="请勿关闭此窗口。", width=20, height=1).pack()
+    tkinter.Label(top, textvariable=progress, width=20, height=3).pack()
+
+    threading.Thread(target=error_check_threading).start()
+
+
+def to_search_definition():
+
+    input_text = t.get("0.0", "end").replace("█", "")
+    output_text = fmt(input_text)
+
+    t.delete("1.0", "end")
+    t.insert("1.0", output_text)
+
+    change_disposable_widget(i3)
+
+
+def search_definition_threading():
 
     start = time.time()
     idioms = []
@@ -230,164 +258,96 @@ def search_definition():
     tkinter.messagebox.showinfo("", "释义查询已完成。成语已自动追加至成语总集.txt中。释义已自动追加至释义总集.txt中。")
 
 
-def main():
+def search_definition():
 
-    global root, t, i1, i2, i3
+    global progress, top
 
-    tk = tkinter.Tk()
-    tk.withdraw()  # 隐藏主窗口，实现只有一个弹窗弹出
-    tkinter.messagebox.showinfo(
-        "",
-        """欢迎使用IDerek。
+    tkinter.messagebox.showinfo("", "释义查询中，请耐心等待……")
+
+    progress = tkinter.StringVar()
+    progress.set("完成度：0%")
+
+    top = tkinter.Toplevel()
+    tkinter.Label(top, text="请勿关闭此窗口。", width=20, height=1).pack()
+    tkinter.Label(top, textvariable=progress, width=20, height=3).pack()
+
+    threading.Thread(target=search_definition_threading).start()
+
+
+word_nums = []
+disposable_widgets = []
+special_words = {
+    b"\xe4\xb8\x80\xe7\x8f\xad\xe9\x9c\xb8\xe6\xb0\x94": b"\xe6\xb0\xb8\xe4\xb9\x85\xe6\xb5\x81\xe4\xbc\xa0",
+    b"\xe9\xaa\x8c\xe8\xaf\x81\xe9\x97\xae\xe9\xa2\x98\xe7\xad\x94\xe6\xa1\x88": b"[0]",
+}
+
+tk = tkinter.Tk()
+tk.withdraw()  # 隐藏主窗口，实现只有一个弹窗弹出
+tkinter.messagebox.showinfo(
+    "",
+    """欢迎使用IDerek。
 请确定有网络连接。
 请从现在开始认真留意下方提示框中的每一个字！！
 反馈请发送至邮箱792405142@qq.com或github@This-username-is-available。""",
-    )
-    tk.destroy()  # 销毁假的主窗口
+)
+tk.destroy()  # 销毁假的主窗口
 
-    root = tkinter.Tk()  # 真的主窗口，这么做是为了防止主窗口失焦
-    root.title("IDerek")
-    w, h = root.maxsize()
-    root.geometry("{}x{}".format(w, h))
+root = tkinter.Tk()  # 真的主窗口，这么做是为了防止主窗口失焦
+root.title("IDerek")
+w, h = root.maxsize()
+root.geometry("{}x{}".format(w, h))
 
-    t = tkinter.Text(root, height=25)
-    t.pack()
+t = tkinter.Text(root, height=25)
+t.pack()
 
-    i3 = [
-        [
-            "Button",
-            root,
-            "查询释义并输出",
-            20,
-            2,
-            lambda: exec(
-                """
-global progress, top
-
-tkinter.messagebox.showinfo("", "释义查询中，请耐心等待……")
-
-progress = tkinter.StringVar()
-progress.set("完成度：0%")
-
-top = tkinter.Toplevel()
-tkinter.Label(top, text = "请勿关闭此窗口。", width = 20, height = 1).pack()
-tkinter.Label(top, textvariable = progress, width = 20, height = 3).pack()
-
-th1 = threading.Thread(target = search_definition)
-th1.start()
-"""
-            ),
-        ],
-        [
-            "Button",
-            root,
-            "完成",
-            20,
-            2,
-            lambda: exec(
-                """
-tkinter.messagebox.showinfo('', '感谢使用IDerek。反馈请发送至邮箱792405142@qq.com或github@This-username-is-available。',)
-root.destroy()
-"""
-            ),
-        ],
-        [
-            "Label",
-            root,
-            """查询释义会将每行的成语后追加上该成语的释义。查询速度约为0.5s至5s一个成语不等，太慢的话请重启电脑再重试。
+i3 = [
+    ["Button", root, "查询释义并输出", 20, 2, search_definition],
+    ["Button", root, "完成", 20, 2, root.destroy],
+    [
+        "Label",
+        root,
+        """查询释义会将每行的成语后追加上该成语的释义。查询速度约为0.5s至5s一个成语不等，太慢的话请重启电脑再重试。
 “████”表示查询不到对应成语释义。
 输入框不支持右键菜单，请善用ctrl+c复制和ctrl+v粘贴。""",
-            120,
-            8,
-        ],
-    ]
+        120,
+        8,
+    ],
+]
 
-    i2 = [
-        [
-            "Button",
-            root,
-            "格式化，查错并标记",
-            20,
-            2,
-            lambda: exec(
-                """
-global progress, top
-
-tkinter.messagebox.showinfo("", "查错中，请耐心等待……")
-
-progress = tkinter.StringVar()
-progress.set("完成度：0%")
-
-top = tkinter.Toplevel()
-tkinter.Label(top, text = "请勿关闭此窗口。", width = 20, height = 1).pack()
-tkinter.Label(top, textvariable = progress, width = 20, height = 3).pack()
-
-th1 = threading.Thread(target = error_check)
-th1.start()
-"""
-            ),
-        ],
-        [
-            "Button",
-            root,
-            "下一环节",
-            20,
-            2,
-            lambda: exec(
-                """
-input_text = t.get("0.0", "end").replace("█", "")
-output_text = fmt(input_text)
-
-t.delete("1.0", "end")
-t.insert("1.0", output_text)
-
-change_disposable_widget(i3)
-"""
-            ),
-        ],
-        [
-            "Label",
-            root,
-            """请将待查错的成语单OCR（图片转文字）结果置于以上输入框内，不需改格式。输入框不支持右键菜单，请善用ctrl+c复制和ctrl+v粘贴。
+i2 = [
+    ["Button", root, "格式化，查错并标记", 20, 2, error_check],
+    ["Button", root, "下一环节", 20, 2, to_search_definition],
+    [
+        "Label",
+        root,
+        """请将待查错的成语单OCR（图片转文字）结果置于以上输入框内，不需改格式。输入框不支持右键菜单，请善用ctrl+c复制和ctrl+v粘贴。
 查错会将原来杂乱的文本自动格式化为每行一个成语的标准格式并用“██”标记错误的成语。查错速度约为0.5s至5s一个成语不等，实在太慢的话请重启电脑再重试。
 有标记的成语需手工改错，改错时更正汉字的错误即可，“██”不用删，也无需删空行和空格。但要保证每行至多有一个成语。中间有标点的成语应把标点去掉。
 手工改错后可以直接下一环节，对自己不放心的还可以再次点击查错检查一遍。
 若有某些“█”误标记，很可能是上一步的字数类型输入错误，如果不是请直接进行下一环节。""",
-            120,
-            8,
-        ],
-    ]
+        120,
+        8,
+    ],
+]
 
-    i1 = [
-        ["Button", root, "点击以输入字数类型", 20, 2, input_word_num],
-        [
-            "Button",
-            root,
-            "下一环节",
-            20,
-            2,
-            lambda: exec(
-                """
-if t.get("0.0", "end").strip() != '':
-    tkinter.messagebox.showinfo("", "输入框内仍有待输入的字数类型，请先点击输入。")
-elif word_nums != []:
-    change_disposable_widget(i2)
-else:
-    tkinter.messagebox.showinfo("", "未输入字数类型！！")
-"""
-            ),
-        ],
-        [
-            "Label",
-            root,
-            "输入字数类型会将输入框中的纯数字作为字数类型输入并清空输入框，例如成语里有四，六，八字成语，那就分三次输入，每次只输入一个纯数字——比如‘4’，然后记！得！按！下！按！钮！！若有其他字数类型请继续输入。输完所有字数类型后再进行下一环节。",
-            120,
-            8,
-        ],
-    ]
+i1 = [
+    ["Button", root, "点击以输入字数类型", 20, 2, input_word_num],
+    ["Button", root, "下一环节", 20, 2, to_error_check],
+    [
+        "Label",
+        root,
+        "输入字数类型会将输入框中的纯数字作为字数类型输入并清空输入框，例如成语里有四，六，八字成语，那就分三次输入，每次只输入一个纯数字——比如‘4’，然后记！得！按！下！按！钮！！若有其他字数类型请继续输入。输完所有字数类型后再进行下一环节。",
+        120,
+        8,
+    ],
+]
 
-    change_disposable_widget(i1)
-    root.mainloop()
+change_disposable_widget(i1)
+root.mainloop()
 
-
-main()
+tk = tkinter.Tk()
+tk.withdraw()  # 隐藏主窗口，实现只有一个弹窗弹出
+tkinter.messagebox.showinfo(
+    "", "感谢使用IDerek。反馈请发送至邮箱792405142@qq.com或github@This-username-is-available。"
+)
+tk.destroy()  # 销毁假的主窗口
