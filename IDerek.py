@@ -90,16 +90,16 @@ def input_word_num():
         if not num:
             tkinter.messagebox.showinfo("", "请在输入框内输入字数类型。")
         else:
-            tkinter.messagebox.showinfo("", "请输入纯数字！！")
+            tkinter.messagebox.showwarning("", "请输入纯数字！！")
 
 
 def to_error_check():
     if t.get("0.0", "end").strip():
-        tkinter.messagebox.showinfo("", "输入框内仍有待输入的字数类型，请先点击输入。")
+        tkinter.messagebox.showwarning("", "输入框内仍有待输入的字数类型，请先点击输入！！")
     elif word_nums:
         change_disposable_widget(i2)
     else:
-        tkinter.messagebox.showinfo("", "未输入字数类型！！")
+        tkinter.messagebox.showwarning("", "未输入字数类型！！")
 
 
 def error_check_threading():
