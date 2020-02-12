@@ -15,6 +15,27 @@ import bs4
 import requests
 
 
+def cut(editor, event=None):
+    editor.event_generate("<<Cut>>")
+
+
+def copy(editor, event=None):
+    editor.event_generate("<<Copy>>")
+
+
+def paste(editor, event=None):
+    editor.event_generate("<<Paste>>")
+
+
+def rightKey(event, editor):
+    """右键菜单"""
+    menubar.delete(0, tkinter.END)
+    menubar.add_command(label="剪切", command=lambda: cut(editor))
+    menubar.add_command(label="复制", command=lambda: copy(editor))
+    menubar.add_command(label="粘贴", command=lambda: paste(editor))
+    menubar.post(event.x_root, event.y_root)
+
+
 def pack_disposable_widget(widget_args):
     """一次性控件打包"""
     if widget_args[0] == "Label":
@@ -27,7 +48,7 @@ def pack_disposable_widget(widget_args):
             justify="left",
         )
         widget.pack()
-        disposable_widgets.append(widget)
+        disposable_widgets.add(widget)
     elif widget_args[0] == "Button":
         widget = tkinter.Button(
             widget_args[1],
@@ -37,9 +58,9 @@ def pack_disposable_widget(widget_args):
             command=widget_args[5],
         )
         widget.pack()
-        disposable_widgets.append(widget)
+        disposable_widgets.add(widget)
     else:
-        raise Exception('"pack_it()" does not support this widget.')
+        raise Exception('"pack_disposable_widget()" does not support this widget.')
     return widget
 
 
@@ -84,8 +105,8 @@ def input_word_num():
     t.delete("1.0", "end")
 
     try:
-        word_nums.append(int(num))
-        tkinter.messagebox.showinfo("", "输入成功。")
+        word_nums.add(int(num))
+        tkinter.messagebox.showinfo("", "输入成功。若有其他字数类型请继续输入。")
     except ValueError:
         if not num:
             tkinter.messagebox.showinfo("", "请在输入框内输入字数类型。")
@@ -97,7 +118,7 @@ def to_error_check():
     if t.get("0.0", "end").strip():
         tkinter.messagebox.showinfo("", "输入框内仍有待输入的字数类型，请先点击输入。")
     elif word_nums:
-        change_disposable_widget(i2)
+        change_disposable_widget(INTERFACE2)
     else:
         tkinter.messagebox.showinfo("", "未输入字数类型！！")
 
@@ -109,13 +130,13 @@ def error_check_threading():
     all_output_idiom = ""
     searched_count = 0
 
-    all_input_idiom = t.get("0.0", "end")
+    all_input_idiom = t.get("0.0", "end").replace("█", "")
 
     idioms = keep_chinese(all_input_idiom).split()
     all_count = len(idioms)
 
     for idiom in idioms:
-        if idiom in [x.decode() for x in list(special_words)] or (
+        if idiom in [x.decode() for x in list(SPECIAL_WORDS)] or (
             len(idiom) in word_nums
             and search_html(idiom).find("抱歉：百度汉语中没有收录相关结果。") == -1
         ):
@@ -141,6 +162,7 @@ def error_check_threading():
             )
         except ZeroDivisionError:
             searched_count += 1
+            progress.set("完成度：100%")
 
     top.destroy()
 
@@ -152,7 +174,7 @@ def error_check_threading():
     elif all_output_idiom.find("█") != -1:
         tkinter.messagebox.showinfo("", "查错已完成。请修改已标记成语的错误。")
     else:
-        tkinter.messagebox.showinfo("", "查错已完成。无错误。可进行下一环节。")
+        tkinter.messagebox.showinfo("", "查错已完成。无错误。")
 
 
 def error_check():
@@ -179,7 +201,7 @@ def to_search_definition():
     t.delete("1.0", "end")
     t.insert("1.0", output_text)
 
-    change_disposable_widget(i3)
+    change_disposable_widget(INTERFACE3)
 
 
 def search_definition_threading():
@@ -207,27 +229,30 @@ def search_definition_threading():
                 .replace(" ", "")
                 .replace("\n", "")
             )
-        elif idiom in [x.decode() for x in list(special_words)]:
-            output_idiom_definition = special_words[idiom.encode()].decode()
+        elif idiom in [x.decode() for x in list(SPECIAL_WORDS)]:
+            output_idiom_definition = SPECIAL_WORDS[idiom.encode()].decode()
         else:
             output_idiom_definition = "████"  # 错误码
 
         all_output_idiom_definition += idiom + "：" + output_idiom_definition + "\n"
+        try:
+            now = time.time()
+            searched_count += 1
+            unsearched_count = all_count - searched_count
+            used_time = now - start
+            speed = searched_count / used_time
+            rest_time = unsearched_count / speed
 
-        now = time.time()
-        searched_count += 1
-        unsearched_count = all_count - searched_count
-        used_time = now - start
-        speed = searched_count / used_time
-        rest_time = unsearched_count / speed
-
-        progress.set(
-            "预计剩余时间：{}s\n完成度：{}%\n速度：{}个/s".format(
-                str(round(rest_time, 2)),
-                str(round(searched_count / all_count * 100, 2)),
-                str(round(speed, 2)),
+            progress.set(
+                "预计剩余时间：{}s\n完成度：{}%\n速度：{}个/s".format(
+                    str(round(rest_time, 2)),
+                    str(round(searched_count / all_count * 100, 2)),
+                    str(round(speed, 2)),
+                )
             )
-        )
+        except ZeroDivisionError:
+            searched_count += 1
+            progress.set("完成度：100%")
 
     top.destroy()
 
@@ -274,9 +299,9 @@ def search_definition():
     threading.Thread(target=search_definition_threading).start()
 
 
-word_nums = []
-disposable_widgets = []
-special_words = {
+word_nums = set()
+disposable_widgets = set()
+SPECIAL_WORDS = {
     b"\xe4\xb8\x80\xe7\x8f\xad\xe9\x9c\xb8\xe6\xb0\x94": b"\xe6\xb0\xb8\xe4\xb9\x85\xe6\xb5\x81\xe4\xbc\xa0",
     b"\xe9\xaa\x8c\xe8\xaf\x81\xe9\x97\xae\xe9\xa2\x98\xe7\xad\x94\xe6\xa1\x88": b"[0]",
 }
@@ -297,52 +322,53 @@ root.title("IDerek")
 w, h = root.maxsize()
 root.geometry("{}x{}".format(w, h))
 
+menubar = tkinter.Menu(root, tearoff=False)
 t = tkinter.Text(root, height=25)
 t.pack()
+t.bind("<Button-3>", lambda x: rightKey(x, t))  # 右键菜单
 
-i3 = [
-    ["Button", root, "查询释义并输出", 20, 2, search_definition],
-    ["Button", root, "完成", 20, 2, root.destroy],
-    [
+INTERFACE3 = (
+    ("Button", root, "查询释义并输出", 20, 2, search_definition),
+    ("Button", root, "完成", 20, 2, root.destroy),
+    (
         "Label",
         root,
-        """查询释义会将每行的成语后追加上该成语的释义。查询速度约为0.5s至5s一个成语不等，太慢的话请重启电脑再重试。
-“████”表示查询不到对应成语释义。
-输入框不支持右键菜单，请善用ctrl+c复制和ctrl+v粘贴。""",
+        """查询释义会将每行的成语后追加上该成语的释义。查错速度与网速正相关，约为0.2个/s到5个/s不等，太慢的话请重启电脑再重试。
+“████”表示查询不到对应成语释义。""",
         120,
         8,
-    ],
-]
+    ),
+)
 
-i2 = [
-    ["Button", root, "格式化，查错并标记", 20, 2, error_check],
-    ["Button", root, "下一环节", 20, 2, to_search_definition],
-    [
+INTERFACE2 = (
+    ("Button", root, "格式化，查错并标记", 20, 2, error_check),
+    ("Button", root, "下一环节", 20, 2, to_search_definition),
+    (
         "Label",
         root,
-        """请将待查错的成语单OCR（图片转文字）结果置于以上输入框内，不需改格式。输入框不支持右键菜单，请善用ctrl+c复制和ctrl+v粘贴。
-查错会将原来杂乱的文本自动格式化为每行一个成语的标准格式并用“██”标记错误的成语。查错速度约为0.5s至5s一个成语不等，实在太慢的话请重启电脑再重试。
-有标记的成语需手工改错，改错时更正汉字的错误即可，“██”不用删，也无需删空行和空格。但要保证每行至多有一个成语。中间有标点的成语应把标点去掉。
+        """请将待查错的成语单OCR（图片转文字）结果置于以上输入框内，不需改格式。
+查错会将原来杂乱的文本自动格式化为每行一个成语的标准格式并用“██”标记错误的成语。查错速度与网速正相关，约为0.2个/s到5个/s不等，实在太慢的话请重启电脑再重试。
+有标记的成语需手工改错，改错时更正汉字的错误即可，“██”不用删，也无需删空行和空格。但要保证每行不能有两个及以上成语。中间有标点的成语应写到一行里并把标点去掉。
 手工改错后可以直接下一环节，对自己不放心的还可以再次点击查错检查一遍。
 若有某些“█”误标记，很可能是上一步的字数类型输入错误，如果不是请直接进行下一环节。""",
         120,
         8,
-    ],
-]
+    ),
+)
 
-i1 = [
-    ["Button", root, "点击以输入字数类型", 20, 2, input_word_num],
-    ["Button", root, "下一环节", 20, 2, to_error_check],
-    [
+INTERFACE1 = (
+    ("Button", root, "点击以输入字数类型", 20, 2, input_word_num),
+    ("Button", root, "下一环节", 20, 2, to_error_check),
+    (
         "Label",
         root,
-        "输入字数类型会将输入框中的纯数字作为字数类型输入并清空输入框，例如成语里有四，六，八字成语，那就分三次输入，每次只输入一个纯数字——比如‘4’，然后记！得！按！下！按！钮！！若有其他字数类型请继续输入。输完所有字数类型后再进行下一环节。",
+        "输入字数类型会将输入框中的纯数字作为字数类型输入并清空输入框，例如成语里有四，六，八字成语，那就分三次输入，每次只输入一个纯数字——比如“4”，然后按下按钮，再重复如上步骤分别输入“6”、“8”。输完所有字数类型后再进行下一环节。",
         120,
         8,
-    ],
-]
+    ),
+)
 
-change_disposable_widget(i1)
+change_disposable_widget(INTERFACE1)
 root.mainloop()
 
 tk = tkinter.Tk()
