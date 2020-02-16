@@ -9,6 +9,7 @@ import threading
 import time
 import tkinter
 import tkinter.messagebox
+import tkinter.scrolledtext
 import urllib.parse
 
 import bs4
@@ -46,6 +47,7 @@ def pack_disposable_widget(widget_args):
             height=widget_args[4],
             wraplength=800,
             justify="left",
+            font=("微软雅黑", 10),
         )
         widget.pack()
         disposable_widgets.add(widget)
@@ -56,6 +58,7 @@ def pack_disposable_widget(widget_args):
             width=widget_args[3],
             height=widget_args[4],
             command=widget_args[5],
+            font=("微软雅黑", 10),
         )
         widget.pack()
         disposable_widgets.add(widget)
@@ -307,8 +310,8 @@ SPECIAL_WORDS = {
     b"\xe9\xaa\x8c\xe8\xaf\x81\xe9\x97\xae\xe9\xa2\x98\xe7\xad\x94\xe6\xa1\x88": b"[0]",
 }
 
-tk = tkinter.Tk()
-tk.withdraw()  # 隐藏主窗口，实现只有一个弹窗弹出
+pseudo_root = tkinter.Tk()
+pseudo_root.withdraw()  # 隐藏主窗口，实现只有一个弹窗弹出
 tkinter.messagebox.showinfo(
     "",
     """欢迎使用IDerek。
@@ -316,7 +319,7 @@ tkinter.messagebox.showinfo(
 请从现在开始认真留意下方提示框中的每一个字！！
 反馈请发送至邮箱792405142@qq.com或github@This-username-is-available。""",
 )
-tk.destroy()  # 销毁假的主窗口
+pseudo_root.destroy()  # 销毁假的主窗口
 
 root = tkinter.Tk()  # 真的主窗口，这么做是为了防止主窗口失焦
 root.title("IDerek")
@@ -324,7 +327,7 @@ w, h = root.maxsize()
 root.geometry("{}x{}".format(w, h))
 
 menubar = tkinter.Menu(root, tearoff=False)
-t = tkinter.Text(root, height=25)
+t = tkinter.scrolledtext.ScrolledText(root, height=17, font=("微软雅黑", 10))
 t.pack()
 t.bind("<Button-3>", lambda x: rightKey(x, t))  # 右键菜单
 
@@ -371,9 +374,9 @@ INTERFACE1 = (
 change_disposable_widget(INTERFACE1)
 root.mainloop()
 
-tk = tkinter.Tk()
-tk.withdraw()  # 隐藏主窗口，实现只有一个弹窗弹出
+pseudo_root = tkinter.Tk()
+pseudo_root.withdraw()  # 隐藏主窗口，实现只有一个弹窗弹出
 tkinter.messagebox.showinfo(
     "", "感谢使用IDerek。反馈请发送至邮箱792405142@qq.com或github@This-username-is-available。"
 )
-tk.destroy()  # 销毁假的主窗口
+pseudo_root.destroy()  # 销毁假的主窗口

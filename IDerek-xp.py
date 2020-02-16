@@ -219,12 +219,23 @@ def main_interface():
     reload(sys)
     sys.setdefaultencoding("utf-8")
 
+    pseudo_root = tk.Tk()
+    pseudo_root.withdraw()  # 隐藏主窗口，实现只有一个弹窗弹出
+    messagebox.showinfo(
+        "",
+        """欢迎使用IDerek。
+    请确定有网络连接。
+    请从现在开始认真留意下方提示框中的每一个字！！
+    反馈请发送至邮箱792405142@qq.com或github@This-username-is-available。""",
+    )
+    pseudo_root.destroy()  # 销毁假的主窗口
+
     window = tk.Tk()
     window.title("IDerek")
     w, h = window.maxsize()
     window.geometry("{}x{}".format(w, h))
 
-    t = tk.Text(window, height=30)
+    t = tk.Text(window, height=25)
     t.pack()
 
     i3 = [
@@ -261,20 +272,13 @@ def main_interface():
         [
             "Label",
             window,
-            "在上面的输入框内输入字数类型，比如我的成语里有四，六，八字成语，那就分三次输入，每次只输入一个纯数字——比如‘4’，然后记！得！按！下！按！钮！！若有其他字数类型请继续输入。输完所有字数类型后再进行下一环节。",
+            "输入字数类型会将输入框中的纯数字作为字数类型输入并清空输入框，例如成语里有四，六，八字成语，那就分三次输入，每次只输入一个纯数字——比如“4”，然后按下按钮，再重复如上步骤分别输入“6”、“8”。输完所有字数类型后再进行下一环节。",
             120,
             8,
         ],
     ]
 
     change_interface(i1)
-    messagebox.showinfo(
-        "",
-        """欢迎使用IDerek。
-请确定有网络连接。
-请从现在开始认真留意下方提示框中的每一个字！！
-反馈请发送至邮箱792405142@qq.com或github@This-username-is-available。""",
-    )
     window.mainloop()
 
 
