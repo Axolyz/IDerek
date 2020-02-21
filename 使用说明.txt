@@ -1,7 +1,7 @@
  Ò»Ð©ÖØÒªµÄ¶«Î÷£º
 
 ÓÉÓÚÉæ¼°Ð´ÈëÎÄ¼þ¿ÉÄÜ±¨¶¾¡£ÐÅÈÎ¾ÍºÃ£¡£¡
-ÕâÊÇÔÚµçÄÔÉÏÓÃµÄ£¡£¡ÊÖ»úÍËÉ¢£¡£¡
+½öÏÞWindowsÏµÍ³£¡£¡ÊÖ»úÍËÉ¢£¡£¡
 ±¾½Ì³Ì¿´ËÆºÜ³¤ÆäÊµºÜ¶ÌÒ²ºÜºÃ¶®£¡£¡±ÈÂÛÊöÀàÎÄ±¾ÔÄ¶Á¼òµ¥Ò»Íò±¶£¡£¡ÔÄ¶ÁÎå·ÖÖÓÊ¡Äú¼¸Ð¡Ê±£¡£¡
 
 
@@ -40,8 +40,9 @@
 Ó¦¸ÃÓÐ¼¸¸öÎÄ¼þÔÚÄãµÄµçÄÔÉÏÊÇ¸ù±¾´ò²»¿ªµÄÎ´ÖªÀàÐÍÎÄ¼þ£¬ÄÇ¾Í±ð¹ÜËü£¬É¾ÁËÒ²Ã»ÊÂ£¬ÄÇÊÇ¸ø¿ª·¢Õß¿´µÄ¡£
 ÐèÒªÔËÐÐµÄÊÇexeÎÄ¼þ£¬txtÎÄ¼þÓÃÓÚ´¢´æÊý¾Ý£¬¼ÓÉÏÄãÏÖÔÚÕýÔÚ¿´µÄtxtÎÄ¼þ£¬Õâ¼¸¸ö²»ÄÜÉ¾£¬ÇÒ±ØÐëÔÚÍ¬Ò»ÎÄ¼þ¼ÐÖÐ¡£
 exeÎÄ¼þ¸ù¾Ý²Ù×÷ÏµÍ³ÁôÒ»¸öÉ¾Ò»¸ö£º
-xp°æÊÇWindowsÍ¨ÓÃµÄ£¬Mac»òLinuxÓÃ²»ÁË¡£µ«ÊÇ²»»áÔÙ¼ÓÈëÐÂ¹¦ÄÜ£¨°üÀ¨µ«²»ÏÞÓÚ¶àÏß³Ì·À¿¨ËÀ£¬½ø¶ÈÏÔÊ¾£¬¸üÍêÉÆµÄËµÃ÷£©£¬Windows xpÖ»ÄÜÓÃÕâ¸ö°æ±¾¡£
-±ê×¼°æÖ»ÄÜÓÃÔÚWin7ÒÔÉÏ²Ù×÷ÏµÍ³¼°Linux»òMacÉÏ£¬»á²»¶Ï¸üÐÂ°æ±¾£¬¼ÓÈëÐÂ¹¦ÄÜ¡£
+xp°æÊÇWindowsÍ¨ÓÃµÄ¡£µ«ÊÇÒÀÀµ¿â¶¼±È½Ï¾É£¬Õæ¿¨ËÀ¸ÅÂÊ»¹±È½Ï¸ß¡£Windows xpÖ»ÄÜÓÃÕâ¸ö°æ±¾¡£
+±ê×¼°æÖ»ÄÜÓÃÔÚWin7ÒÔÉÏ²Ù×÷ÏµÍ³£¬ÓÃ»§ÌåÑé¸üºÃ£¬ui»¹ÊÇÔ­ÉúµÄ¡£
+ÐÂ°æ»á·¢²¼ÔÚhttps://github.com/This-username-is-available/IDerekÉÏ¡£
 £¨ÇóÇóÄãÃÇÁË×°¸öWin7/10°É¡££©
 ¹ØÓÚÁ½¸ötxtÎÄ¼þ£º
 Á½¸ö×Ü¼¯.txtÊÕÂ¼ÁËËùÓÐÓÃIDerek²éÑ¯¹ýµÄ³ÉÓïºÍÊÍÒå£¬¿ÉËæÒâ¸ü¸ÄÄÚÈÝ£¬µ«²»¿ÉÖØÃüÃû¡£
@@ -54,20 +55,18 @@ xp°æÊÇWindowsÍ¨ÓÃµÄ£¬Mac»òLinuxÓÃ²»ÁË¡£µ«ÊÇ²»»áÔÙ¼ÓÈëÐÂ¹¦ÄÜ£¨°üÀ¨µ«²»ÏÞÓÚ¶àÏß³Ì·
 ÆäÊµOCR¾«¶È²¢²»Ì«ÖØÒª£¬ÒòÎª³ÌÐò»¹ÓÐ²é´í¹¦ÄÜ¡£
 
 ¹ØÓÚ·´À¡£º
-ÓÃ×Å²»Ë³¾Í·´À¡°É£¬»á»ØµÄ£¬·¢µ½ÓÊÏä792405142@qq.com»ògithub@This-username-is-available¡£²ÉÄÉÁË·´À¡µÄÐÂ°æ»á·¢²¼ÔÚhttps://github.com/This-username-is-available/IDerekÉÏ¡£
+ÓÃ×Å²»Ë³¾Í·´À¡°É£¬»á»ØµÄ£¬·¢µ½ÓÊÏä792405142@qq.com»ògithub@This-username-is-available¡£
 ÕâÀïÓÐÒ»Ð©¿ÉÄÜµÄ¸Ä½ø·½Ïò£¬Èç¹ûÈ·ÊµÐèÒª¿ÉÒÔ¸½ÔÚ·´À¡Àï¡£
 ¡¤ Ö§³Ö´øÐòºÅÊä³ö
 ¡¤ Ö§³Ö³ÉÓïÖ®¼ä¿ÕÐÐ
 
-¹ØÓÚ²âÊÔÓÃÀý£º
-²¿·ÖOCR½á¹û£º£¨¹±Ï×Õß£ºÑ¶·ÉÊäÈë·¨£©
-360¡¢Î£ÑÔÎ£ÐÐ361¡¢Îå·çÊ®Óê362¡¢ÖÍ·çãåÓê363¡¢×ï²»ÈÝÖï364¡¢ÇóÌïÎÊÉá
-365¡¢½­ºÓÈÕÏÂ366¡¢Ä¿ÎÞÈ«Å£367¡¢¾Ã¼Ù²»¹é368¡¢µÇ¸ß×Ô±°369¡¢µç¹â»ðÊ¯
-370¡¢·çÉùº×ºí371¡¢¹¦°Ü´¹³É372¡¢¹ÏÌïÀîÏÂ373¡¢´ºÒâ²ûÉº374¡¢Ôø¼¸ºÎÊ±
-375¡¢²»¿¯Ö®ÂÛ376¡¢³ÇÏÂÖ®ÃË377¡¢Âí¸ï¹üÊ¬378¡¢ÈýÈË³É»¢379¡¢²Ý³¤Ýº·É
-380¡¢´º·ç»¯Óê381¡¢¶¹¿ÜÄê»ª382¡¢¹í¸«Éñ¹¤383¡¢º¬Ó¢¾×»ª384¡¢¾Ù°¸ÆëÃ¼
-385¡¢ÀúÀúÔÚÄ¿386¡¢Ãî±ÊÉú»¨387¡¢ÅÄÊÖ³Æ¿ì388¡¢Æ½·ÖÇïÉ«389¡¢Æ¼Ë®Ïà·ê
-390¡¢ÇàÃ·ÖñÂí391¡¢Ü°ÖñÄÑÊé392¡¢Èçãå´º·ç393¡¢ÈçÊý¼ÒÕä394¡¢Ê¯ÆÆÌì¾ª
+¹ØÓÚÊ¾ÀýÎÄ±¾£º
+²¿·ÖOCR½á¹û£º
+¡°435¡¢Òà²½ÒàÇ÷436¡¢ÒçÃÀÖ®´Ê437¡¢Ó¬Óª¹·¹¶438¡¢Ô½×é´ú¶ò439¡¢ÕñÕñÓÐ´Ê
+440¡¢×ÔÃü²»·²?441¡¢×ø¶øÂÛµÀ442¡¢³¨Öã×ÔÕä443¡¢Å××©ÒýÓñ444¡¢ÎÞ¹¦ÊÜÂ»
+A45¡¢¼¤Ð»²»µØ446¡¢²»ÁÐÃÅÇ½447¡¢ÐÅ±ÊÍ¿Ñ»448¡¢µÂ±¡²ÅÊè449¡¢Ç÷Ö®Èô—l
+450¡¢Ò»µÃÖ®ÓÞ451¡¢²»×ã¹Ò³Ý452¡¢µñ³æÐ¡¼¼453¡¢±ã¶Ì¼³Éî454¡¢¶«Í¿Î÷¡±
+£¨Õâ¸ÐÈËµÄÊ¶±ðÂÊ£©
 
 
 ¿ÉÄÜ³öÏÖµÄÎÊÌâ£º
