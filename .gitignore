@@ -135,4 +135,5 @@ dmypy.json
 .pytype/
 
 # My configurations:
-build_exe
+build_exe/
+.vscode/

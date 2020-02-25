@@ -1,9 +1,14 @@
 # !/usr/bin/env python2
 #  -*- coding: utf-8 -*-
-# @Author             : Li Baoyan
-# @Date               : 2020-01-03 19:19:53
-# @Last Modified by   : Li Baoyan
-# @Last Modified time : 2020-01-03 19:19:53
+
+"""
+@Author       : Li Baoyan
+@Date         : 2019-11-11 14:26:45
+@Github       : https://github.com/This-username-is-available
+@LastEditTime : 2020-02-21 22:06:14
+@LastEditors  : Li Baoyan
+@Description  : 成语单OCR结果格式化改错查询释义并输出。
+"""
 
 from __future__ import with_statement
 from __future__ import division
@@ -32,7 +37,7 @@ def paste(editor, event=None):
     editor.event_generate(u"<<Paste>>")
 
 
-def rightKey(event, editor):
+def right_key(event, editor):
     u"""右键菜单"""
     menubar.delete(0, Tkinter.END)
     menubar.add_command(label=u"剪切", command=lambda: cut(editor))
@@ -400,7 +405,7 @@ if __name__ == u"__main__":
     menubar = Tkinter.Menu(root, tearoff=False)
     t = ScrolledText.ScrolledText(root, width=100, height=18, font=(u"微软雅黑", 10))
     t.pack()
-    t.bind(u"<Button-3>", lambda x: rightKey(x, t))  # 右键菜单
+    t.bind(u"<Button-3>", lambda x: right_key(x, t))  # 右键菜单
 
     INTERFACE3 = (
         (

@@ -1,9 +1,14 @@
-# !/usr/bin/env python3
-#  -*- coding: utf-8 -*-
-# @Author             : Li Baoyan
-# @Date               : 2020-01-03 19:19:53
-# @Last Modified by   : Li Baoyan
-# @Last Modified time : 2020-01-03 19:19:53
+#!/usr/bin/env python
+# coding=utf-8
+
+"""
+@Author       : Li Baoyan
+@Date         : 2019-11-11 14:26:45
+@Github       : https://github.com/This-username-is-available
+@LastEditTime : 2020-02-22 15:35:16
+@LastEditors  : Li Baoyan
+@Description  : 成语单OCR结果格式化改错查询释义并输出。
+"""
 
 import threading
 import time
@@ -28,7 +33,7 @@ def paste(editor, event=None):
     editor.event_generate("<<Paste>>")
 
 
-def rightKey(event, editor):
+def right_key(event, editor):
     """右键菜单"""
     menubar.delete(0, tkinter.END)
     menubar.add_command(label="剪切", command=lambda: cut(editor))
@@ -37,8 +42,7 @@ def rightKey(event, editor):
     menubar.post(event.x_root, event.y_root)
 
 
-def pack_disposable_widget(widget_args):
-    """一次性控件打包"""
+def pack_disposable_widget(widget_args):  # 一次性控件打包
     if widget_args[0] == "Label":
         widget = tkinter.Label(
             widget_args[1],
@@ -67,8 +71,7 @@ def pack_disposable_widget(widget_args):
     return widget
 
 
-def change_disposable_widget(interface):
-    """一次性控件转场"""
+def change_disposable_widget(interface):  # 一次性控件转场
     for widgets in disposable_widgets:
         widgets.destroy()
     disposable_widgets.clear()
@@ -87,8 +90,7 @@ def search_html(idiom):  # 最核心部分（然而很弱智
     return idiom_html
 
 
-def keep_chinese(content):
-    """输入文本，返回所有非中文字符变成空格的文本"""
+def keep_chinese(content):  # 输入文本，返回所有非中文字符变成空格的文本
     contentstr = ""
     for char in content:
         if char >= u"\u4e00" and char <= u"\u9fa5":
@@ -100,7 +102,7 @@ def keep_chinese(content):
 
 def check_timeout():
     while is_searching:
-        time.sleep(5)
+        time.sleep(CHECK_INTERVAL)
         check_time = time.time()
         if check_time - last_search_time > TIMEOUT:
             tkinter.messagebox.showerror("", "请求超时，请重试，或重启电脑后重试。")
@@ -109,8 +111,8 @@ def check_timeout():
 
 def input_word_num():
 
-    num = t.get("0.0", "end").strip()
-    t.delete("1.0", "end")
+    num = text_box.get("0.0", "end").strip()
+    text_box.delete("1.0", "end")
 
     try:
         word_nums.add(int(num))
@@ -123,7 +125,7 @@ def input_word_num():
 
 
 def to_search_definition():
-    if t.get("0.0", "end").strip():
+    if text_box.get("0.0", "end").strip():
         tkinter.messagebox.showwarning("", "输入框内仍有待输入的字数类型，请先点击输入！！")
     elif word_nums:
         change_disposable_widget(INTERFACE2)
@@ -144,11 +146,11 @@ def search_definition_gui(function):
     tkinter.Label(top, text="请勿关闭此窗口。", width=20, height=1).pack()
     tkinter.Label(top, textvariable=progress, width=20, height=3).pack()
 
-    all_input_idiom = t.get("0.0", "end").replace("█", "").strip()
+    all_input_idiom = text_box.get("0.0", "end").replace("█", "").strip()
 
-    th1 = threading.Thread(target=function, args=(all_input_idiom,))
-    th1.setDaemon(True)
-    th1.start()
+    Thread_1 = threading.Thread(target=function, args=(all_input_idiom,))
+    Thread_1.setDaemon(True)
+    Thread_1.start()
 
     wait_until_complete()
 
@@ -158,12 +160,12 @@ def wait_until_complete():
     global all_output_idiom
 
     if is_searching:
-        root.after(500, wait_until_complete)
+        root.after(CHECK_INTERVAL * 1000, wait_until_complete)  # 自我调用以实现定时调用效果
     else:
         top.destroy()
 
-        t.delete("1.0", "end")
-        t.insert("1.0", all_output_idiom)
+        text_box.delete("1.0", "end")
+        text_box.insert("1.0", all_output_idiom)
 
         change_disposable_widget(INTERFACE3)
 
@@ -185,16 +187,16 @@ def search_definition_first_time_threading(all_input_idiom):
 
     idioms = [
         idiom for idiom in keep_chinese(all_input_idiom).split() if idiom
-    ]  # 成语文本转列表
+    ]  # 成语文本格式化后转列表
 
     all_count = len(idioms)
-    start = time.time()
+    start_searching_time = time.time()
     last_search_time = time.time()
     searched_count = 0
 
-    th1 = threading.Thread(target=check_timeout)
-    th1.setDaemon(True)
-    th1.start()
+    Thread_1 = threading.Thread(target=check_timeout)
+    Thread_1.setDaemon(True)
+    Thread_1.start()
 
     for idiom in idioms:
         idiom_html = search_html(idiom)
@@ -203,7 +205,7 @@ def search_definition_first_time_threading(all_input_idiom):
                 bs4.BeautifulSoup(idiom_html, "lxml")
                 .find(class_="tab-content")
                 .find_all(name="p")
-            )
+            )  # 词条的释义一栏
             output_idiom = (
                 idiom
                 + "："
@@ -212,7 +214,7 @@ def search_definition_first_time_threading(all_input_idiom):
                 )
                 .replace(" ", "")
                 .replace("\n", "")
-            )
+            )  # p节点除子节点外内容
         elif idiom in [x.decode() for x in list(SPECIAL_WORDS)]:
             output_idiom = idiom + "：" + SPECIAL_WORDS[idiom.encode()].decode()
         else:
@@ -222,7 +224,7 @@ def search_definition_first_time_threading(all_input_idiom):
             last_search_time = time.time()
             searched_count += 1
             unsearched_count = all_count - searched_count
-            used_time = last_search_time - start
+            used_time = last_search_time - start_searching_time
             speed = searched_count / used_time
             rest_time = unsearched_count / speed
             progress.set(
@@ -254,13 +256,13 @@ def search_definition_again_threading(all_input_idiom):
     all_count = len(
         [idiom for idiom in idioms if idiom.find("：") == -1]
     )  # 没有":"，即没查过的词语总数
-    start = time.time()
+    start_searching_time = time.time()
     last_search_time = time.time()
     searched_count = 0
 
-    th1 = threading.Thread(target=check_timeout)
-    th1.setDaemon(True)
-    th1.start()
+    Thread_1 = threading.Thread(target=check_timeout)
+    Thread_1.setDaemon(True)
+    Thread_1.start()
 
     for idiom in idioms:
         if idiom.find("：") != -1:
@@ -296,7 +298,7 @@ def search_definition_again_threading(all_input_idiom):
                 last_search_time = time.time()
                 searched_count += 1
                 unsearched_count = all_count - searched_count
-                used_time = last_search_time - start
+                used_time = last_search_time - start_searching_time
                 speed = searched_count / used_time
                 rest_time = unsearched_count / speed
                 progress.set(
@@ -318,14 +320,16 @@ def search_definition_again_threading(all_input_idiom):
 def output_definition():
 
     all_output_idiom_definition = "\n".join(
-        [idiom for idiom in t.get("0.0", "end").strip().split() if idiom]
+        [
+            idiom for idiom in text_box.get("0.0", "end").strip().split() if idiom
+        ]  # 按空字符串划分后再连接的成语释义和未查出的成语
     )
     all_output_idiom = "\n".join(
         [
             line.split("：")[0] if line.find("：") != -1 else line.strip()
-            for line in all_output_idiom_definition.split("\n")
+            for line in all_output_idiom_definition.split()
         ]
-    )
+    )  # 按空字符串划分，从释义行提出冒号之前的成语再连接
 
     with open("成语总集.txt", "r+", encoding="gbk") as all_idiom_file:
         content = all_idiom_file.read()
@@ -379,8 +383,8 @@ if __name__ == "__main__":
         b"\xe4\xb8\x80\xe7\x8f\xad\xe9\x9c\xb8\xe6\xb0\x94": b"\xe6\xb0\xb8\xe4\xb9\x85\xe6\xb5\x81\xe4\xbc\xa0",
         b"\xe9\xaa\x8c\xe8\xaf\x81\xe9\x97\xae\xe9\xa2\x98\xe7\xad\x94\xe6\xa1\x88": b"[0]",
     }
-    TIMEOUT = 30
-
+    TIMEOUT = 30  # (s)
+    CHECK_INTERVAL = 5  # (s)
     pure_messagebox(
         """欢迎使用IDerek。
     请确定有网络连接。
@@ -390,13 +394,15 @@ if __name__ == "__main__":
 
     root = tkinter.Tk()
     root.title("IDerek")
-    w, h = root.maxsize()
-    root.geometry("{}x{}".format(w, h))
+    width, height = root.maxsize()
+    root.geometry("{}x{}".format(width, height))
 
     menubar = tkinter.Menu(root, tearoff=False)
-    t = tkinter.scrolledtext.ScrolledText(root, width=100, height=18, font=("微软雅黑", 10))
-    t.pack()
-    t.bind("<Button-3>", lambda x: rightKey(x, t))  # 右键菜单
+    text_box = tkinter.scrolledtext.ScrolledText(
+        root, width=100, height=18, font=("微软雅黑", 10)
+    )
+    text_box.pack()
+    text_box.bind("<Button-3>", lambda x: right_key(x, text_box))  # 右键菜单
 
     INTERFACE3 = (
         (
