@@ -136,5 +136,4 @@ dmypy.json
 
 # My configurations:
 .vscode/
-1activate.bat
-1run_code.bat
+build_exe/

@@ -29,9 +29,9 @@ import requests
 def is_connected():
     try:
         requests.get("http://www.baidu.com", timeout=5)
+        return True
     except:
         return False
-    return True
 
 
 def right_key(event, editor):  # 右键菜单
@@ -208,7 +208,7 @@ def wait_until_complete():
         elif not idioms:
             tkinter.messagebox.showinfo("", "请将待查询的成语单OCR（图片转文字）结果置于以上输入框内。")
         elif is_searching != []:
-            search_definition_gui(search_definition_final_threading, "改错已应用。查询释义中。")
+            search_definition_gui(search_definition_final_threading, "已全部应用。查询释义中。")
         elif is_searching == []:
             change_disposable_widget(INTERFACE3)
             text_box.insert("1.0", all_output_idiom)
@@ -270,14 +270,16 @@ async def fetch_for_first_searching(sem, idiom, session):
         async with sem:
             while True:
                 try:
-                    async with session.get(url, params=params, headers=headers) as resp:
+                    async with session.get(
+                        url, params=params, headers=headers, timeout=30
+                    ) as resp:
                         idiom_html = await resp.text("utf-8", "ignore")
                     timeouts = 0
                     break
                 except:
                     idiom_html = ""
                     timeouts += 1
-                    if timeouts == 20:  # 连续五次超时
+                    if timeouts == CONTINUOUS_TIMEOUTS_MAX:  # 连续五次超时
                         tkinter.messagebox.showerror("", "请求超时，请重试，或重启电脑后重试。")
                         root.destroy()
 
@@ -314,14 +316,17 @@ def search_definition_again_threading(all_input_idiom):
 
     is_searching = True
 
-    foo = [line for line in all_input_idiom.split() if line.find("->") != -1]
+    foo = [line for line in all_input_idiom.split("\n") if line.find("->") != -1]
 
-    user_corrects = {i.split("->")[0]: i.split("->")[1] for i in foo}
-    changed_words = user_corrects.values()
+    user_corrects = {i.split("->")[0].strip(): i.split("->")[1].strip() for i in foo}
+    changed_words = [x for x in user_corrects.values() if x]
     idioms = [
-        user_corrects[idiom]
-        if idiom in user_corrects.keys() and user_corrects[idiom]
-        else idiom
+        idiom
+        for idiom in idioms
+        if idiom not in user_corrects.keys() or user_corrects[idiom]
+    ]
+    idioms = [
+        user_corrects[idiom] if idiom in user_corrects.keys() else idiom
         for idiom in idioms
     ]
 
@@ -364,7 +369,7 @@ async def fetch_for_final_searching(sem, idiom, session):
     global last_search_time, searched_count, timeouts
 
     if len(idiom) in banned_nums:
-        output_idiom = "██" + idiom
+        output_idiom = idiom + "（请修改此处）"
     elif idiom in SPECIAL_WORDS.keys():
         output_idiom = idiom + "：" + SPECIAL_WORDS[idiom]
     else:
@@ -377,21 +382,23 @@ async def fetch_for_final_searching(sem, idiom, session):
         async with sem:
             while True:
                 try:
-                    async with session.get(url, params=params, headers=headers) as resp:
+                    async with session.get(
+                        url, params=params, headers=headers, timeout=30
+                    ) as resp:
                         idiom_html = await resp.text("utf-8", "ignore")
                     timeouts = 0
                     break
                 except:
                     idiom_html = ""
                     timeouts += 1
-                    if timeouts == 20:  # 连续五次超时
+                    if timeouts == CONTINUOUS_TIMEOUTS_MAX:  # 连续五次超时
                         tkinter.messagebox.showerror("", "请求超时，请重试，或重启电脑后重试。")
                         root.destroy()
 
         if get_def(idiom_html):
             output_idiom = idiom + "：" + get_def(idiom_html)
         else:
-            output_idiom = "██" + idiom
+            output_idiom = idiom + "（请修改此处）"
 
         try:
             last_search_time = time.time()
@@ -456,7 +463,8 @@ if __name__ == "__main__":
 
     is_searching = True
     disposable_widgets = []
-    CHECK_INTERVAL = 1  # (s)
+    CONTINUOUS_TIMEOUTS_MAX = 30
+    CHECK_INTERVAL = 1
     POOL = 10
     corrects = {}
 
@@ -492,7 +500,7 @@ if __name__ == "__main__":
             "Label",
             root,
             """输出释义会将成语自动追加至成语总集.txt中，释义自动追加至释义总集.txt中。
-跳过改错建议的成语会以“██”标记，方便后期处理时改动文件""",
+跳过改错建议的成语会在后面加上“（请修改此处）”，方便后期处理时改动文件""",
             120,
             8,
         ),
@@ -515,7 +523,7 @@ if __name__ == "__main__":
             20,
             2,
             lambda: search_definition_gui(
-                search_definition_final_threading, "已跳过余下改错建议。查询释义中。"
+                search_definition_final_threading, "已跳过。查询释义中。"
             ),
         ),
         (
