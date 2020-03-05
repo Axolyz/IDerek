@@ -96,11 +96,9 @@ def get_def(idiom_html):
             .find(name="div", class_="tab-content")
             .find_all(name=["p", "dt"])
         )
-        a = (
-            "".join([passage_text.contents[0].string for passage_text in passage_texts])
-            .replace(" ", "")
-            .replace("\n", "")
-        )
+        a = "".join(
+            [passage_text.contents[0].string.strip() for passage_text in passage_texts]
+        ).replace("\n", "")
         return a
     except:
         try:
@@ -120,6 +118,16 @@ def get_def(idiom_html):
             return a
         except:
             return False
+
+
+def get_idiom(idiom_html):
+    a = (
+        bs4.BeautifulSoup(idiom_html, "lxml")
+        .find(name="strong")
+        .string.strip()
+        .replace(" ", "")
+    )
+    return a
 
 
 def keep_chinese(content):  # 输入文本，返回所有非中文字符（除逗号）变成空格的文本
@@ -284,7 +292,11 @@ async def fetch_for_first_searching(sem, idiom, session):
                         root.destroy()
 
         if get_def(idiom_html):
-            pass
+            if get_idiom(idiom_html) == idiom:
+                pass
+            else:
+                print(idiom + get_idiom(idiom_html))
+                corrects[idiom] = get_idiom(idiom_html)
         else:
             if len(idiom) <= 2:
                 corrects[idiom] = idiom
@@ -499,7 +511,7 @@ if __name__ == "__main__":
         (
             "Label",
             root,
-            """输出释义会将成语自动追加至成语总集.txt中，释义自动追加至释义总集.txt中。
+            """输出释义会将成语自动追加至文件中。
 跳过改错建议的成语会在后面加上“（请修改此处）”，方便后期处理时改动文件""",
             120,
             8,
@@ -533,7 +545,7 @@ if __name__ == "__main__":
 对于某些不知道原型是什么的成语，请善用记事本或word的查找功能然后对照原图。
 若想删除某些成语请直接删除箭头右侧改错建议。
 应用改错会应用审阅后的改错建议并显示错误的改错建议以供再次审阅。
-若有某些修改后正确的改错建议无法应用，请再应用一次，还不行的话直接跳过余下改错建议。""",
+若有某些正确的改错建议无法应用，直接跳过余下改错建议。""",
             120,
             8,
         ),
