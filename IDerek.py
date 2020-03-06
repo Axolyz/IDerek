@@ -7,7 +7,7 @@
 @Github       : https://github.com/This-username-is-available
 @LastEditTime : 2020-02-25 12:43:59
 @LastEditors  : Li Baoyan
-@Description  : 成语单OCR结果格式化，自动改错，批量查询释义。
+@Description  : 包括成语单OCR结果格式化，自动改错，批量查询成语释义。
 """
 
 
