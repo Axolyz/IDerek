@@ -7,7 +7,7 @@
 @Github       : https://github.com/This-username-is-available
 @LastEditTime : 2020-02-25 12:43:59
 @LastEditors  : Li Baoyan
-@Description  : 成语单OCR结果格式化改错查询释义并输出。
+@Description  : 成语单OCR结果格式化，自动改错，批量查询释义。
 """
 
 
@@ -506,12 +506,12 @@ if __name__ == "__main__":
     c1.pack()
 
     INTERFACE3 = (
-        ("Button", root, "输出释义至文件", 20, 2, output_definition),
+        ("Button", root, "导出释义至文件", 20, 2, output_definition),
         ("Button", root, "退出", 20, 2, root.destroy),
         (
             "Label",
             root,
-            """输出释义会将成语自动追加至文件中。
+            """导出释义会将成语自动追加至文件中。
 跳过改错建议的成语会在后面加上“（请修改此处）”，方便后期处理时改动文件""",
             120,
             8,
