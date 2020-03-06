@@ -140,16 +140,6 @@ def keep_chinese(content):  # 输入文本，返回所有非中文字符（除�
     return contentstr
 
 
-def only_keep_chinese(content):  # 输入文本，返回所有删除非中文字符的文本
-    contentstr = ""
-    for char in content:
-        if (char >= u"\u4e00") and (char <= u"\u9fa5"):
-            contentstr += char
-        else:
-            contentstr = contentstr + ""
-    return contentstr
-
-
 def correct(idiom):
     advise = difflib.get_close_matches(idiom, ALL_IDIOMS, n=1, cutoff=0)
     return advise[0]
@@ -240,9 +230,9 @@ def search_definition_first_time_threading(all_input_idiom):
     is_searching = True
 
     idioms = [
-        only_keep_chinese(idiom)
+        idiom.strip(",").strip("，").replace(",", "，")
         for idiom in keep_chinese(all_input_idiom).split()
-        if only_keep_chinese(idiom)
+        if idiom.strip(",").strip("，")
     ]  # 成语文本格式化后转列表
     all_count = len(idioms)
     start_searching_time = time.time()
