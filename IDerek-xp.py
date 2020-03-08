@@ -25,6 +25,11 @@ import requests
 from io import open
 
 
+def create_file(name):
+    with open(name, u"a"):
+        pass
+
+
 def cut(editor, event=None):
     editor.event_generate(u"<<Cut>>")
 
@@ -336,6 +341,8 @@ def output_definition():
         ]
     )
 
+    create_file(u"成语总集.txt")
+    create_file(u"释义总集.txt")
     with open(u"成语总集.txt", u"r+", encoding=u"gbk") as all_idiom_file:
         content = all_idiom_file.read()
         all_idiom_file.seek(0, 0)

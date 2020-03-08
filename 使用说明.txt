@@ -9,12 +9,13 @@
 
 ¹ØÓÚ¸÷ÖÖÎÄ¼þ£º
 ºó×ºÎªpy£¬mdºÍgitignoreµÄÎÄ¼þÉ¾ÁËÒ²Ã»ÊÂ£¬ÄÇÊÇ¸ø¿ª·¢Õß¿´µÄ¡£
-ÐèÒªÔËÐÐµÄÊÇexeÎÄ¼þ£¬ÓÃÓÚ´¢´æÊý¾ÝµÄÊÇtxtÎÄ¼þºÍjson£¬Õâ¼¸¸ö²»ÄÜÉ¾£¬ÇÒ±ØÐëÔÚÍ¬Ò»ÎÄ¼þ¼ÐÖÐ¡£
+Í¼Æ¬ÊÇ¸öÔÞÖú¶þÎ¬Âë£¬Èç¹û¾õµÃºÃÓÃ¿ÉÒÔÉ¨Ò»ÏÂÇëÎÒºÈ±­¿§·È~
+ÐèÒªÔËÐÐµÄÊÇexeÎÄ¼þ£¬ÓÃÓÚ´¢´æÊý¾ÝµÄÊÇÉú³ÉµÄÁ½¸ötxtÎÄ¼þºÍjsonÎÄ¼þ£¬Õâ¼¸¸ö²»ÄÜÉ¾£¬ÇÒ±ØÐëÔÚÍ¬Ò»ÎÄ¼þ¼ÐÖÐ¡£
 exeÎÄ¼þ¸ù¾Ý²Ù×÷ÏµÍ³ÁôÒ»¸öÉ¾Ò»¸ö£º
 xp°æÊÇWindowsÍ¨ÓÃµÄ¡£µ«ÊÇ²é´ÊÂß¼­Ïàµ±Âäºó£¬²»Ö§³Ö×Ô¶¯¸Ä´í£¬¶øÇÒ¾Þ£¡Âý£¡ÎÞ£¡±È£¡¡£Windows xpÖ»ÄÜÓÃÕâ¸ö°æ±¾¡£
 ±ê×¼°æÖ»ÄÜÓÃÔÚWin7ÒÔÉÏ²Ù×÷ÏµÍ³£¬ËÙ¶È·É¿ì£¬Ö§³Ö×Ô¶¯¸Ä´í¡£¶øÇÒÀíÂÛÉÏÊÇ²éµÄÔ½¶àËÙ¶ÈÔ½¿ì¡£
 ¹ØÓÚÁ½¸ötxtÎÄ¼þ£º
-Á½¸ö×Ü¼¯.txtÊÕÂ¼ÁËËùÓÐÓÃIDerek²éÑ¯¹ýµÄ³ÉÓïºÍÊÍÒå£¬¿ÉËæÒâ¸ü¸ÄÄÚÈÝ£¬µ«²»¿ÉÖØÃüÃû¡£
+Á½¸ö×Ü¼¯.txt»áÔÚÊ×´ÎÊä³öÊÍÒåÊ±×Ô¶¯Éú³É¡£»áÊÕÂ¼ËùÓÐÓÃIDerek²éÑ¯¹ýµÄ³ÉÓïºÍÊÍÒå£¬¿ÉËæÒâ¸ü¸ÄÄÚÈÝ¡£
 
 ¹ØÓÚºÃÓÃµÄOCRÈí¼þ£º
 °×Ãè£¨ÉÃ³¤´òÓ¡Ìå£¬×Ô´øÉ¨Ãè£©£¬Ñ¶·ÉÊäÈë·¨£¨´òÓ¡ÊÖÐ´Ìå¶¼ÉÃ³¤£¬½¨ÒéÏÈÓÃÆäËûÈí¼þ£¨Èç°×Ãè»òcsÉ¨ÃèÍõ£©É¨ÃèÔÙÊ¶±ð£©¡£
@@ -34,11 +35,11 @@ xp°æÊÇWindowsÍ¨ÓÃµÄ¡£µ«ÊÇ²é´ÊÂß¼­Ïàµ±Âäºó£¬²»Ö§³Ö×Ô¶¯¸Ä´í£¬¶øÇÒ¾Þ£¡Âý£¡ÎÞ£¡±È£¡¡
 
 ¡°558.Ò»ÎÞËù»ñ£¬364¡¢¶þÈýÆäµÂ
 ËÄÌå²»ÇÚ/Îå¹È²»·Ö ÁùÉñÎÞÖ÷
-??? ÆßÆ´°Ë´ÕdjjdiiÍý¾ÅÑÔÊ®£¬£¿'?†ªàÂ£¬¡±
+        ÆßÆ´°Ë´ÕdjjdiiÍý¾ÅÑÔÊ®£¬£¿'?†ªàÂ£¬¡±
 
 Î¨Ò»²»ºÃÅªµÄÀý×ÓÊÇÏÂÃæÕâÖÖ£º
 
-¡°Ê®ÊÒ¾Å¿Õ°ËÈÁÆßÀÌÁùÇ×²»ºÍÎåÄÚÈç·Ù¡±
+¡°ÜýÜý´ó¶Ë¶úå¦Ä¿È¾ÉùË»Á¦½ßÖøÊéÁ¢Ëµ¡±
 
 »òÕßÕâÑù£º
 
@@ -47,9 +48,6 @@ xp°æÊÇWindowsÍ¨ÓÃµÄ¡£µ«ÊÇ²é´ÊÂß¼­Ïàµ±Âäºó£¬²»Ö§³Ö×Ô¶¯¸Ä´í£¬¶øÇÒ¾Þ£¡Âý£¡ÎÞ£¡±È£¡¡
 £¨ÄÃÊ²Ã´·Ö¸ô¶¼ÐÐ¾ÍÊÇ±ðÁ½¸ö³ÉÓïÖ®¼äÖ»ÓÃÒ»¸ö¶ººÅ£¡£¡ÄÇÊÇ±êÊ¶°Ë×Ö³ÉÓïÓÃµÄ£¡£¡£©
 
 ÕâÖÖ¿ÉÄÜÐèÒªÄãÈ¥³ÌÐò½çÃæ°´¼¸Ê®¸öenter²ÅÐÐ¡­¡­¸üºÃµÄÑ¡ÔñÊÇ»»Ò»¸öÄÜ°ïÄãÅÅ°æµÄOCRÈí¼þ¡£
-
-¹ØÓÚ¹Ø±Õ£º
-ËæÊ±¿ÉÒÔÓÒÉÏ½Ç¹Ø±ÕÖ÷´°¿ÚÇÒ²»»á´øÀ´ÈÎºÎÓÀ¾ÃÐÔËðÊ§¡£
 
 ¹ØÓÚ×Ô¶¨Òå³ÉÓïÊÍÒå£º
 ×ÔÐÐ¸Ä¶¯user_data.json£¬´Ë´¦²»×¸ÊöjsonÎÄ±¾¸ñÊ½¡£

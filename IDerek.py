@@ -34,6 +34,11 @@ def is_connected():
         return False
 
 
+def create_file(name):
+    with open(name, "a"):
+        pass
+
+
 def right_key(event, editor):  # 右键菜单
     def cut(editor, event=None):
         editor.event_generate("<<Cut>>")
@@ -437,6 +442,8 @@ def output_definition():
         ]
     )  # 按空字符串划分，从释义行提出冒号之前的成语再连接
 
+    create_file("成语总集.txt")
+    create_file("释义总集.txt")
     with open("成语总集.txt", "r+", encoding="gbk") as all_idiom_file:
         content = all_idiom_file.read()
         all_idiom_file.seek(0, 0)
