@@ -101,7 +101,7 @@ def get_def(idiom_html):
             .find(name="div", class_="tab-content")
             .find_all(name=["p", "dt"])
         )
-        a = "".join(
+        a = " ".join(
             [passage_text.contents[0].string.strip() for passage_text in passage_texts]
         ).replace("\n", "")
         return a
@@ -113,13 +113,9 @@ def get_def(idiom_html):
                 .find(name="div", class_="tab-content")
                 .find_all(name=["p", "dt"])
             )
-            a = (
-                "".join(
-                    [passage_text.contents[0].string for passage_text in passage_texts]
-                )
-                .replace(" ", "")
-                .replace("\n", "")
-            )
+            a = " ".join(
+                [passage_text.contents[0].string for passage_text in passage_texts]
+            ).replace("\n", "")
             return a
         except:
             return False
@@ -430,17 +426,14 @@ async def fetch_for_final_searching(sem, idiom, session):
 
 def output_definition():
 
-    all_output_idiom_definition = "\n".join(
-        [
-            idiom for idiom in text_box.get("0.0", "end").strip().split() if idiom
-        ]  # 按空字符串划分后再连接的成语释义和未查出的成语
-    )
+    all_output_idiom_definition = text_box.get("0.0", "end").strip()
+
     all_output_idiom = "\n".join(
         [
             line.split("：")[0] if line.find("：") != -1 else line.strip()
-            for line in all_output_idiom_definition.split()
+            for line in all_output_idiom_definition.split("\n")
         ]
-    )  # 按空字符串划分，从释义行提出冒号之前的成语再连接
+    )  # 从释义行提出冒号之前的成语再连接
 
     create_file("成语总集.txt")
     create_file("释义总集.txt")
