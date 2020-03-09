@@ -93,23 +93,37 @@ def change_disposable_widget(interface):  # 一次性控件转场
         pack_disposable_widget(widgets)
 
 
-def get_def(idiom_html):
-    try:
-        passage_texts = (
-            bs4.BeautifulSoup(idiom_html, "lxml")
-            .find(name="div", class_="content means imeans", id="basicmean-wrapper")
-            .find(name="div", class_="tab-content")
-            .find_all(name=["p", "dt"])
-        )
-        a = " ".join(
-            [passage_text.contents[0].string.strip() for passage_text in passage_texts]
-        ).replace("\n", "")
-        return a
-    except:
+def get_def(idiom, idiom_html):
+    if len(idiom) == 1:
+        try:
+            pinyins = (
+                bs4.BeautifulSoup(idiom_html, "lxml")
+                .find(name="div", id="word-header", class_="header-info")
+                .find(class_="pronounce", id="pinyin")
+                .find_all(name="b")
+            )
+            passage_texts = (
+                bs4.BeautifulSoup(idiom_html, "lxml")
+                .find(name="div", class_="content means imeans", id="basicmean-wrapper")
+                .find(name="div", class_="tab-content")
+                .find_all(name=["p", "dt"])
+            )
+            passage_texts = pinyins + passage_texts
+            a = " ".join(
+                [
+                    passage_text.contents[0].string.strip()
+                    for passage_text in passage_texts
+                ]
+            ).replace("\n", "")
+            return a
+        except:
+            return False
+
+    else:
         try:
             passage_texts = (
                 bs4.BeautifulSoup(idiom_html, "lxml")
-                .find(name="div", class_="content", id="baike-wrapper")
+                .find(name="div", class_="content means imeans", id="basicmean-wrapper")
                 .find(name="div", class_="tab-content")
                 .find_all(name=["p", "dt"])
             )
@@ -121,7 +135,22 @@ def get_def(idiom_html):
             ).replace("\n", "")
             return a
         except:
-            return False
+            try:
+                passage_texts = (
+                    bs4.BeautifulSoup(idiom_html, "lxml")
+                    .find(name="div", class_="content", id="baike-wrapper")
+                    .find(name="div", class_="tab-content")
+                    .find_all(name=["p", "dt"])
+                )
+                a = " ".join(
+                    [
+                        passage_text.contents[0].string.strip()
+                        for passage_text in passage_texts
+                    ]
+                ).replace("\n", "")
+                return a
+            except:
+                return False
 
 
 def get_idiom(idiom, idiom_html):
@@ -295,7 +324,7 @@ async def fetch_for_first_searching(sem, idiom, session):
                         tkinter.messagebox.showerror("", "请求超时，请重试，或重启电脑后重试。")
                         root.destroy()
 
-        if get_def(idiom_html):
+        if get_def(idiom, idiom_html):
             if get_idiom(idiom, idiom_html) == idiom:
                 pass
             else:
@@ -410,8 +439,8 @@ async def fetch_for_final_searching(sem, idiom, session):
                         tkinter.messagebox.showerror("", "请求超时，请重试，或重启电脑后重试。")
                         root.destroy()
 
-        if get_def(idiom_html):
-            output_idiom = idiom + "：" + get_def(idiom_html)
+        if get_def(idiom, idiom_html):
+            output_idiom = idiom + "：" + get_def(idiom, idiom_html)
         else:
             output_idiom = idiom + "（请修改此处）"
 
