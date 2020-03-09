@@ -114,20 +114,26 @@ def get_def(idiom_html):
                 .find_all(name=["p", "dt"])
             )
             a = " ".join(
-                [passage_text.contents[0].string for passage_text in passage_texts]
+                [
+                    passage_text.contents[0].string.strip()
+                    for passage_text in passage_texts
+                ]
             ).replace("\n", "")
             return a
         except:
             return False
 
 
-def get_idiom(idiom_html):
-    a = (
-        bs4.BeautifulSoup(idiom_html, "lxml")
-        .find(name="strong")
-        .string.strip()
-        .replace(" ", "")
-    )
+def get_idiom(idiom, idiom_html):
+    try:
+        a = (
+            bs4.BeautifulSoup(idiom_html, "lxml")
+            .find(name="strong")
+            .string.strip()
+            .replace(" ", "")
+        )
+    except:
+        a = idiom
     return a
 
 
@@ -211,6 +217,12 @@ def wait_until_complete():
         elif is_searching == []:
             change_disposable_widget(INTERFACE3)
             text_box.insert("1.0", all_output_idiom)
+            if all_output_idiom.find("（请修改此处）") == -1:
+                tkinter.messagebox.showinfo("", "查询完毕，无错误。")
+            else:
+                tkinter.messagebox.showinfo(
+                    "", "查询完毕，有错误成语，仍错误的成语会自动在后面加上“（请修改此处）”，方便后期处理，请善用记事本的查找功能。"
+                )
 
 
 async def async_main(idioms, function, pool):
@@ -283,11 +295,11 @@ async def fetch_for_first_searching(sem, idiom, session):
                         root.destroy()
 
         if get_def(idiom_html):
-            if get_idiom(idiom_html) == idiom:
+            if get_idiom(idiom, idiom_html) == idiom:
                 pass
             else:
-                print(idiom + get_idiom(idiom_html))
-                corrects[idiom] = get_idiom(idiom_html)
+                print(idiom + get_idiom(idiom, idiom_html))
+                corrects[idiom] = get_idiom(idiom, idiom_html)
         else:
             if len(idiom) <= 2:
                 corrects[idiom] = idiom
@@ -486,7 +498,7 @@ if __name__ == "__main__":
 
     menubar = tkinter.Menu(root, tearoff=False)
     text_box = tkinter.scrolledtext.ScrolledText(
-        root, width=100, height=18, font=("微软雅黑", 10)
+        root, width=100, height=20, font=("微软雅黑", 10)
     )
     text_box.pack()
     text_box.bind("<Button-3>", lambda x: right_key(x, text_box))  # 右键菜单
@@ -498,7 +510,6 @@ if __name__ == "__main__":
     INTERFACE3 = (
         ("Button", root, "导出释义至文件", 20, 2, output_definition),
         ("Button", root, "退出", 20, 2, root.destroy),
-        ("Label", root, """仍错误的成语会自动在后面加上“（请修改此处）”，方便后期处理时改动文件""", 120, 8),
     )
     INTERFACE2 = (
         (
