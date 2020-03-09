@@ -128,6 +128,7 @@ def get_idiom(idiom, idiom_html):
     try:
         a = (
             bs4.BeautifulSoup(idiom_html, "lxml")
+            .find(name="div", id="term-header")
             .find(name="strong")
             .string.strip()
             .replace(" ", "")
@@ -298,7 +299,6 @@ async def fetch_for_first_searching(sem, idiom, session):
             if get_idiom(idiom, idiom_html) == idiom:
                 pass
             else:
-                print(idiom + get_idiom(idiom, idiom_html))
                 corrects[idiom] = get_idiom(idiom, idiom_html)
         else:
             if len(idiom) <= 2:
