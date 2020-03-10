@@ -335,23 +335,23 @@ async def fetch_for_first_searching(sem, idiom, session):
             elif len(idiom) > 2:
                 corrects[idiom] = correct(idiom)
 
-        try:
-            last_search_time = time.time()
-            searched_count += 1
-            unsearched_count = all_count - searched_count
-            used_time = last_search_time - start_searching_time
-            speed = searched_count / used_time
-            rest_time = unsearched_count / speed
-            progress.set(
-                "预计剩余时间：{}s\n{}\n{}个/s".format(
-                    str(int(rest_time)),
-                    str(progress_bar(searched_count / all_count, 15)),
-                    str(int(speed)),
-                )
+    try:
+        last_search_time = time.time()
+        searched_count += 1
+        unsearched_count = all_count - searched_count
+        used_time = last_search_time - start_searching_time
+        speed = searched_count / used_time
+        rest_time = unsearched_count / speed
+        progress.set(
+            "预计剩余时间：{}s\n{}\n{}个/s".format(
+                str(int(rest_time)),
+                str(progress_bar(searched_count / all_count, 15)),
+                str(int(speed)),
             )
-        except ZeroDivisionError:
-            searched_count += 1
-            progress.set(progress_bar(1, 15))
+        )
+    except ZeroDivisionError:
+        searched_count += 1
+        progress.set(progress_bar(1, 15))
 
 
 def search_definition_again_threading(all_input_idiom):
@@ -444,23 +444,23 @@ async def fetch_for_final_searching(sem, idiom, session):
         else:
             output_idiom = idiom + "（请修改此处）"
 
-        try:
-            last_search_time = time.time()
-            searched_count += 1
-            unsearched_count = all_count - searched_count
-            used_time = last_search_time - start_searching_time
-            speed = searched_count / used_time
-            rest_time = unsearched_count / speed
-            progress.set(
-                "预计剩余时间：{}s\n{}\n{}个/s".format(
-                    str(int(rest_time)),
-                    str(progress_bar(searched_count / all_count, 15)),
-                    str(int(speed)),
-                )
+    try:
+        last_search_time = time.time()
+        searched_count += 1
+        unsearched_count = all_count - searched_count
+        used_time = last_search_time - start_searching_time
+        speed = searched_count / used_time
+        rest_time = unsearched_count / speed
+        progress.set(
+            "预计剩余时间：{}s\n{}\n{}个/s".format(
+                str(int(rest_time)),
+                str(progress_bar(searched_count / all_count, 15)),
+                str(int(speed)),
             )
-        except ZeroDivisionError:
-            searched_count += 1
-            progress.set(progress_bar(1, 15))
+        )
+    except ZeroDivisionError:
+        searched_count += 1
+        progress.set(progress_bar(1, 15))
 
     return output_idiom
 
