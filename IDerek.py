@@ -499,7 +499,7 @@ def output_definition():
             + content
         )
 
-    tkinter.messagebox.showinfo("", "成语已自动追加至成语总集.txt中。释义已自动追加至释义总集.txt中。")
+    tkinter.messagebox.showinfo("", "导出完毕。")
 
 
 if __name__ == "__main__":
@@ -515,9 +515,9 @@ if __name__ == "__main__":
         tkinter.messagebox.showerror("", "检测到网络连接异常，请保证网络状况良好。")
         sys.exit()
 
-    with open("idiom.json", "r", encoding="utf-8") as database:
+    with open("data/idiom.json", "r", encoding="utf-8") as database:
         ALL_IDIOMS = json.load(database)
-    with open("user_data.json", "r", encoding="utf-8") as user_data:
+    with open("data/user_data.json", "r", encoding="utf-8") as user_data:
         SPECIAL_WORDS = json.load(user_data)
 
     root = tkinter.Tk()
@@ -539,6 +539,13 @@ if __name__ == "__main__":
     INTERFACE3 = (
         ("Button", root, "导出释义至文件", 20, 2, output_definition),
         ("Button", root, "退出", 20, 2, root.destroy),
+        (
+            "Label",
+            root,
+            """导出释义会将成语和释义导入程序所在文件夹中的成语总集.txt和释义总集.txt。若文件不存在会自动创建，若存在则会在历史记录上追加。""",
+            120,
+            8,
+        ),
     )
     INTERFACE2 = (
         (
