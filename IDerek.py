@@ -236,7 +236,7 @@ def wait_until_complete():
         text_box.delete("1.0", "end")
 
         if corrects:
-            all_output_idiom = "\n".join([k + "->" + v for k, v in corrects.items()])
+            all_output_idiom = "\n".join([k + "→" + v for k, v in corrects.items()])
             text_box.insert("1.0", all_output_idiom)
             change_disposable_widget(INTERFACE2)
             tkinter.messagebox.showinfo("", "已完成。请审阅改错建议。")
@@ -360,9 +360,9 @@ def search_definition_again_threading(all_input_idiom):
 
     is_searching = True
 
-    foo = [line for line in all_input_idiom.split("\n") if line.find("->") != -1]
+    foo = [line for line in all_input_idiom.split("\n") if line.find("→") != -1]
 
-    user_corrects = {i.split("->")[0].strip(): i.split("->")[1].strip() for i in foo}
+    user_corrects = {i.split("→")[0].strip(): i.split("→")[1].strip() for i in foo}
     changed_words = [x for x in user_corrects.values() if x]
     idioms = [
         idiom
