@@ -5,17 +5,21 @@
 ±¾½Ì³Ì¿´ËÆºÜ³¤ÆäÊµºÜ¶ÌÒ²ºÜºÃ¶®£¡£¡±ÈÂÛÊöÀàÎÄ±¾ÔÄ¶Á¼òµ¥Ò»Íò±¶£¡£¡ÔÄ¶ÁÎå·ÖÖÓÊ¡Äú¼¸Ð¡Ê±£¡£¡
 
 ¹ØÓÚÓÃ·¨£º
-ÐèÒªÒ»¸ö³ÉÓïµ¥ºÍÒ»¸öOCR£¨Í¼Æ¬×ªÎÄ×Ö£©Èí¼þ£¬°Ñ³ÉÓïµ¥µÄOCR½á¹û´æµ½word»ò¼ÇÊÂ±¾£¨ÕâºÜÖØÒª£¡£©¾Í¿ÉÒÔÔËÐÐ³ÌÐòÁË¡£Èç¹ûÓÐ³ÉÓïµ¥µÄÎÄ±¾Ò²¿ÉÒÔÖ±½ÓÓÃ¡£³ÌÐòÄÚ¸½ÓÐÏàµ±Íê±¸µÄÊ¹ÓÃËµÃ÷¡£
+ÐèÒªÒ»¸ö³ÉÓïµ¥ºÍÒ»¸öOCR£¨Í¼Æ¬×ªÎÄ×Ö£©Èí¼þ£¬°Ñ³ÉÓïµ¥µÄOCR½á¹û´æµ½word»ò¼ÇÊÂ±¾£¨ÕâºÜÖØÒª£¡£©¡£Èç¹ûÓÐ³ÉÓïµ¥µÄÎÄ±¾Ò²¿ÉÒÔÖ±½ÓÓÃ¡£
+È»ºóÔËÐÐexeÎÄ¼þ£¬³ÌÐòÄÚ¸½ÓÐÏàµ±Íê±¸µÄÊ¹ÓÃËµÃ÷¡£
 
 ¹ØÓÚ¸÷ÖÖÎÄ¼þ£º
+
 Ê×ÏÈ²é¿´ÎÄ¼þºó×ºÃû¡£
 ²Î¿¼£ºhttp://www.win7zhijia.cn/jiaocheng/win7_25250.html
 ºó×ºÎªpy£¬mdºÍgitignoreµÄÎÄ¼þÉ¾ÁËÒ²Ã»ÊÂ£¬ÄÇÊÇ¸ø¿ª·¢Õß¿´µÄ¡£
 Í¼Æ¬ÊÇ¸öÔÞÖú¶þÎ¬Âë£¬Èç¹û¾õµÃºÃÓÃ¿ÉÒÔÉ¨Ò»ÏÂÇëÎÒºÈ±­¿§·È~
 ÐèÒªÔËÐÐµÄÊÇexeÎÄ¼þ£¬ÓÃÓÚ´¢´æÊý¾ÝµÄÊÇ×Ô¶¯Éú³ÉµÄtxtÎÄ¼þºÍdataÎÄ¼þ¼Ð£¬Õâ¼¸¸ö²»ÄÜÉ¾£¬ÇÒ±ØÐëÔÚÍ¬Ò»ÎÄ¼þ¼ÐÖÐ¡£
+
 exeÎÄ¼þ¸ù¾Ý²Ù×÷ÏµÍ³ÁôÒ»¸öÉ¾Ò»¸ö£º
 xp°æÊÇWindowsÍ¨ÓÃµÄ¡£µ«ÊÇ²é´ÊÂß¼­Ïàµ±Âäºó£¬²»Ö§³Ö×Ô¶¯¸Ä´í£¬´íÎóÂÊ½Ï¸ß¡£¶øÇÒ¾Þ£¡Âý£¡ÎÞ£¡±È£¡¡£Windows xpÖ»ÄÜÓÃÕâ¸ö°æ±¾¡£ÏÖÒÑÍ£Ö¹¸üÐÂ¹¦ÄÜ¡£
 ±ê×¼°æÖ»ÄÜÓÃÔÚWin7ÒÔÉÏ²Ù×÷ÏµÍ³£¬ËÙ¶È·É¿ì£¬Ö§³Ö×Ô¶¯¸Ä´í¡£¶øÇÒÀíÂÛÉÏÊÇ²éµÄÔ½¶àËÙ¶ÈÔ½¿ì¡£
+
 ¹ØÓÚÁ½¸ötxtÎÄ¼þ£º
 Á½¸ö×Ü¼¯.txtÊÕÂ¼ÁËËùÓÐÓÃIDerek²éÑ¯¹ýµÄ³ÉÓïºÍÊÍÒå£¬¿ÉËæÒâ¸ü¸ÄÄÚÈÝ£¬µ«²»¿ÉÖØÃüÃû£¬ÎªÁË±£´æÀúÊ·Ò²¾¡Á¿²»ÒªÒÆ¶¯¡£
 
@@ -27,7 +31,7 @@ xp°æÊÇWindowsÍ¨ÓÃµÄ¡£µ«ÊÇ²é´ÊÂß¼­Ïàµ±Âäºó£¬²»Ö§³Ö×Ô¶¯¸Ä´í£¬´íÎóÂÊ½Ï¸ß¡£¶øÇÒ¾Þ£¡Â
 ³ÌÐò±¾ÉíÏà¹Ø£º
 
 ¹ØÓÚÓÃÍ¾£º
-ÎªÁË¶Ô¸¶´óÁ¿¼¯ÖÐµÄ²é³ÉÓïÈÎÎñ£¬°üÀ¨³ÉÓïµ¥OCR½á¹û¸ñÊ½»¯£¬×Ô¶¯¸Ä´í£¬ÅúÁ¿²éÑ¯³ÉÓïÊÍÒå¡£¿ÉÒÔ½øÐÐ¼¸ºõÈ«×Ô¶¯µÄ£¬ËÙ¶È·É¿ìµÄÅúÁ¿²Ù×÷¡£
+ÎªÁË½â¾ö´óÁ¿¼¯ÖÐ²éÑ¯³ÉÓïµÄÐèÇó£¬°üÀ¨³ÉÓïµ¥OCR½á¹û¸ñÊ½»¯£¬×Ô¶¯¸Ä´í£¬ÅúÁ¿²éÑ¯³ÉÓï»ò´ÊÓïÊÍÒå¡£¿ÉÒÔ½øÐÐ¼¸ºõÈ«×Ô¶¯µÄ£¬ËÙ¶È·É¿ìµÄÅúÁ¿²Ù×÷¡£
 ¿ÉÒÔ²éÑ¯£¨°üÀ¨µ«²»ÏÞÓÚ£©ºº×Ö£¬´ÊÓï£¬ÊõÓï£¬³ÉÓï¡£
 
 ¹ØÓÚ¶ÔOCR½á¹û¸ñÊ½µÄÒªÇó£º
