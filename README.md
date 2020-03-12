@@ -86,7 +86,7 @@ xp版是Windows通用的。但是查词逻辑相当落后，不支持自动改�
 
 ## License
 
-MIT 开源许可协议
+MIT License
 
 Copyright © 2020 This-username-is-available
 
