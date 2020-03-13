@@ -1,5 +1,7 @@
 # IDerek（语流）
 
+<img src="https://i.loli.net/2020/03/13/ShB1HLiFNCOAW6u.png" style="zoom:20%">
+
 包括成语单OCR结果格式化，自动改错，批量查询成语或词语释义。极其业余，大神轻喷。
 
 可以查询（包括但不限于）汉字，词语，术语，成语。
@@ -88,7 +90,9 @@ xp版是Windows通用的。但是查词逻辑相当落后，不支持自动改�
 
 如果这个项目帮到了你，给我个星标吧！
 
-也可以扫项目内的赞助二维码请我喝杯咖啡哦~
+也可以扫这个赞助二维码请我喝杯咖啡哦~
+
+<img src="https://i.loli.net/2020/03/13/83wLpUO7ZJb1qya.jpg" style="zoom:20%">
 
 ## License
 
