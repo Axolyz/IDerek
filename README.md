@@ -80,7 +80,7 @@ xp版是Windows通用的。但是查词逻辑相当落后，不支持自动改�
 
 ## 作者：
 
-- Github:@This-username-is-available
+- Github：@This-username-is-available 
 
 - 邮箱：792405142@qq.com
 
