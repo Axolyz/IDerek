@@ -32,6 +32,8 @@ xp版：Windows xp+操作系统或Python2.7+
 
 通过在成语数据库中进行相似度比对实现自动改错。
 
+爬取成语数据库的脚本在我的项目[my-baiduhanyu](https://github.com/This-username-is-available/my-baiduhanyu)中，还附带一个爬释义的。
+
 ## 关于不同版本
 
 xp版是Windows通用的。但是查词逻辑相当落后，不支持自动改错，错误率较高。而且巨！慢！无！比！。Windows xp只能用这个版本。现已停止更新功能。
