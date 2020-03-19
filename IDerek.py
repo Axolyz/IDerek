@@ -39,7 +39,58 @@ def create_file(name):
         pass
 
 
-def right_key(event, editor):  # 右键菜单
+def keep_chinese(content):  # 输入文本，返回所有非中文字符（除逗号）变成空格的文本
+    contentstr = ""
+    for char in content:
+        if ((char >= u"\u4e00") and (char <= u"\u9fa5")) or char == "," or char == "，":
+            contentstr += char
+        else:
+            contentstr = contentstr + " "
+    return contentstr
+
+
+def correct(idiom):
+    advise = difflib.get_close_matches(idiom, ALL_IDIOMS, n=1, cutoff=0)
+    return advise[0]
+
+
+def correct_it(idiom):
+    if len(idiom) <= 2:
+        corrects[idiom] = idiom
+    elif len(idiom) > 2:
+        corrects[idiom] = correct(idiom)
+
+
+def progress_bar(progress, length):
+    blank = (
+        "|"
+        + "█" * int(progress * length)
+        + " " * (length - int(progress * length))
+        + "|"
+    )
+    return blank
+
+
+def update_progress(searched_count):
+    try:
+        last_search_time = time.time()
+        searched_count += 1
+        unsearched_count = all_count - searched_count
+        used_time = last_search_time - start_searching_time
+        speed = searched_count / used_time
+        rest_time = unsearched_count / speed
+        progress.set(
+            "预计剩余时间：{}s\n{}\n{}个/s".format(
+                str(int(rest_time)),
+                str(progress_bar(searched_count / all_count, 15)),
+                str(int(speed)),
+            )
+        )
+    except ZeroDivisionError:
+        progress.set(progress_bar(1, 15))
+
+
+def right_key(event, editor):
     def cut(editor, event=None):
         editor.event_generate("<<Cut>>")
 
@@ -167,34 +218,173 @@ def get_idiom(idiom, idiom_html):
     return a
 
 
-def keep_chinese(content):  # 输入文本，返回所有非中文字符（除逗号）变成空格的文本
-    contentstr = ""
-    for char in content:
-        if ((char >= u"\u4e00") and (char <= u"\u9fa5")) or char == "," or char == "，":
-            contentstr += char
+async def aio_requests(idiom, sem, session):
+    global timeouts
+    url = "https://hanyu.baidu.com/s"
+    params = {"wd": idiom, "ptype": "zici"}
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.116 Safari/537.36"
+    }
+
+    async with sem:
+        while True:
+            try:
+                async with session.get(
+                    url, params=params, headers=headers, timeout=30
+                ) as resp:
+                    idiom_html = await resp.text("utf-8", "ignore")
+                timeouts = 0
+                break
+            except:
+                idiom_html = ""
+                timeouts += 1
+                if timeouts == CONTINUOUS_TIMEOUTS_MAX:
+                    tkinter.messagebox.showerror("", "请求超时，请重试，或重启电脑后重试。")
+                    root.destroy()
+    return idiom_html
+
+
+async def async_main(idioms, function, pool):
+    async with aiohttp.ClientSession() as session:
+        sem = asyncio.Semaphore(pool)
+        tasks = []
+        for idiom in idioms:
+            task = asyncio.ensure_future(function(sem, idiom, session))
+            tasks.append(task)
+        a = await asyncio.gather(*tasks)
+        return a
+
+
+async def fetch_for_first_and_again_search(sem, idiom, session):
+
+    global last_search_time, searched_count, timeouts
+
+    if len(idiom) in banned_nums:
+        correct_it(idiom)
+    elif idiom in SPECIAL_WORDS.keys():
+        pass
+    else:
+        task = asyncio.ensure_future(aio_requests(idiom, sem, session))
+        idiom_html = await asyncio.gather(task)
+        idiom_html = idiom_html[0]
+        if get_def(idiom, idiom_html):
+            if get_idiom(idiom, idiom_html) == idiom:
+                pass
+            else:
+                corrects[idiom] = get_idiom(idiom, idiom_html)
         else:
-            contentstr = contentstr + " "
-    return contentstr
+            correct_it(idiom)
+
+    update_progress(searched_count)
+    searched_count += 1
 
 
-def correct(idiom):
-    advise = difflib.get_close_matches(idiom, ALL_IDIOMS, n=1, cutoff=0)
-    return advise[0]
+async def fetch_for_final_search(sem, idiom, session):
+
+    global last_search_time, searched_count, timeouts
+
+    if len(idiom) in banned_nums:
+        output_idiom = idiom + "（请修改此处）"
+    elif idiom in SPECIAL_WORDS.keys():
+        output_idiom = idiom + "：" + SPECIAL_WORDS[idiom]
+    else:
+        task = asyncio.ensure_future(aio_requests(idiom, sem, session))
+        idiom_html = await asyncio.gather(task)
+        idiom_html = idiom_html[0]
+        if get_def(idiom, idiom_html):
+            output_idiom = idiom + "：" + get_def(idiom, idiom_html)
+        else:
+            output_idiom = idiom + "（请修改此处）"
+
+    update_progress(searched_count)
+    searched_count += 1
+
+    return output_idiom
 
 
-def progress_bar(progress, length):
-    blank = (
-        "|"
-        + "█" * int(progress * length)
-        + " " * (length - int(progress * length))
-        + "|"
+def search_definition_first_time_threading(all_input_idiom):
+
+    global state, last_search_time, searched_count, all_count, start_searching_time, idioms
+
+    state == "searching"
+
+    idioms = [
+        idiom.strip(",").strip("，").replace(",", "，")
+        for idiom in keep_chinese(all_input_idiom).split()
+        if idiom.strip(",").strip("，")
+    ]  # 成语文本格式化后转列表
+    all_count = len(idioms)
+    start_searching_time = time.time()
+    last_search_time = time.time()
+    searched_count = 0
+
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+    loop.run_until_complete(async_main(idioms, fetch_for_first_and_again_search, POOL))
+    loop.close()
+
+    state = "free"
+
+
+def search_definition_again_threading(all_input_idiom):
+
+    global all_output_idiom, state, last_search_time, searched_count, all_count, start_searching_time, idioms
+
+    state == "searching"
+
+    foo = [line for line in all_input_idiom.split("\n") if line.find("→") != -1]
+
+    user_corrects = {i.split("→")[0].strip(): i.split("→")[1].strip() for i in foo}
+    changed_words = [x for x in user_corrects.values() if x]
+    idioms = [
+        idiom
+        for idiom in idioms
+        if idiom not in user_corrects.keys() or user_corrects[idiom]
+    ]
+    idioms = [
+        user_corrects[idiom] if idiom in user_corrects.keys() else idiom
+        for idiom in idioms
+    ]
+
+    all_count = len(changed_words)
+    start_searching_time = time.time()
+    last_search_time = time.time()
+    searched_count = 0
+
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+    loop.run_until_complete(
+        async_main(changed_words, fetch_for_first_and_again_search, POOL)
     )
-    return blank
+    loop.close()
+
+    state = "free"
+
+
+def search_definition_final_threading(all_input_idiom):
+
+    global all_output_idiom, state, last_search_time, searched_count, all_count, start_searching_time, idioms
+
+    state == "searching"
+
+    all_count = len(idioms)
+    start_searching_time = time.time()
+    last_search_time = time.time()
+    searched_count = 0
+
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+    all_output_idiom = "\n".join(
+        loop.run_until_complete(async_main(idioms, fetch_for_final_search, POOL))
+    )
+    loop.close()
+
+    state = "searched"
 
 
 def search_definition_gui(function, text):
 
-    global progress, progress_top, banned_nums, corrects
+    global progress, progress_top, banned_nums, corrects, state
 
     corrects = {}
     if not var1.get():
@@ -221,6 +411,7 @@ def search_definition_gui(function, text):
     Thread_1.setDaemon(True)
     Thread_1.start()
 
+    state = "searching"
     wait_until_complete()
 
 
@@ -228,7 +419,7 @@ def wait_until_complete():
 
     global all_output_idiom
 
-    if is_searching:
+    if state == "searching":
         root.after(CHECK_INTERVAL * 1000, wait_until_complete)  # 自我调用以实现定时调用效果
     else:
         progress_top.destroy()
@@ -242,9 +433,9 @@ def wait_until_complete():
             tkinter.messagebox.showinfo("", "已完成。请审阅改错建议。")
         elif not idioms:
             tkinter.messagebox.showinfo("", "请将待查询的成语单OCR（图片转文字）结果置于以上输入框内。")
-        elif is_searching != []:
+        elif state != "searched":
             search_definition_gui(search_definition_final_threading, "已全部应用。查询释义中。")
-        elif is_searching == []:
+        elif state == "searched":
             change_disposable_widget(INTERFACE3)
             text_box.insert("1.0", all_output_idiom)
             if all_output_idiom.find("（请修改此处）") == -1:
@@ -253,216 +444,6 @@ def wait_until_complete():
                 tkinter.messagebox.showinfo(
                     "", "查询完毕，有错误成语，仍错误的成语会自动在后面加上“（请修改此处）”，方便后期处理，请善用记事本的查找功能。"
                 )
-
-
-async def async_main(idioms, function, pool):
-    async with aiohttp.ClientSession() as session:
-        sem = asyncio.Semaphore(pool)
-        tasks = []
-        for idiom in idioms:
-            task = asyncio.ensure_future(function(sem, idiom, session))
-            tasks.append(task)
-        a = await asyncio.gather(*tasks)
-        return a
-
-
-def search_definition_first_time_threading(all_input_idiom):
-
-    global is_searching, last_search_time, searched_count, all_count, start_searching_time, idioms
-
-    is_searching = True
-
-    idioms = [
-        idiom.strip(",").strip("，").replace(",", "，")
-        for idiom in keep_chinese(all_input_idiom).split()
-        if idiom.strip(",").strip("，")
-    ]  # 成语文本格式化后转列表
-    all_count = len(idioms)
-    start_searching_time = time.time()
-    last_search_time = time.time()
-    searched_count = 0
-
-    loop = asyncio.new_event_loop()
-    asyncio.set_event_loop(loop)
-    loop.run_until_complete(async_main(idioms, fetch_for_first_searching, POOL))
-    loop.close()
-
-    is_searching = False
-
-
-async def fetch_for_first_searching(sem, idiom, session):
-
-    global last_search_time, searched_count, timeouts
-
-    if len(idiom) in banned_nums:
-        if len(idiom) <= 2:
-            corrects[idiom] = idiom
-        elif len(idiom) > 2:
-            corrects[idiom] = correct(idiom)
-    elif idiom in SPECIAL_WORDS.keys():
-        pass
-    else:
-        url = "https://hanyu.baidu.com/s"
-        params = {"wd": idiom, "ptype": "zici"}
-        headers = {
-            "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.116 Safari/537.36"
-        }
-
-        async with sem:
-            while True:
-                try:
-                    async with session.get(
-                        url, params=params, headers=headers, timeout=30
-                    ) as resp:
-                        idiom_html = await resp.text("utf-8", "ignore")
-                    timeouts = 0
-                    break
-                except:
-                    idiom_html = ""
-                    timeouts += 1
-                    if timeouts == CONTINUOUS_TIMEOUTS_MAX:  # 连续五次超时
-                        tkinter.messagebox.showerror("", "请求超时，请重试，或重启电脑后重试。")
-                        root.destroy()
-
-        if get_def(idiom, idiom_html):
-            if get_idiom(idiom, idiom_html) == idiom:
-                pass
-            else:
-                corrects[idiom] = get_idiom(idiom, idiom_html)
-        else:
-            if len(idiom) <= 2:
-                corrects[idiom] = idiom
-            elif len(idiom) > 2:
-                corrects[idiom] = correct(idiom)
-
-    try:
-        last_search_time = time.time()
-        searched_count += 1
-        unsearched_count = all_count - searched_count
-        used_time = last_search_time - start_searching_time
-        speed = searched_count / used_time
-        rest_time = unsearched_count / speed
-        progress.set(
-            "预计剩余时间：{}s\n{}\n{}个/s".format(
-                str(int(rest_time)),
-                str(progress_bar(searched_count / all_count, 15)),
-                str(int(speed)),
-            )
-        )
-    except ZeroDivisionError:
-        searched_count += 1
-        progress.set(progress_bar(1, 15))
-
-
-def search_definition_again_threading(all_input_idiom):
-
-    global all_output_idiom, is_searching, last_search_time, searched_count, all_count, start_searching_time, idioms
-
-    is_searching = True
-
-    foo = [line for line in all_input_idiom.split("\n") if line.find("→") != -1]
-
-    user_corrects = {i.split("→")[0].strip(): i.split("→")[1].strip() for i in foo}
-    changed_words = [x for x in user_corrects.values() if x]
-    idioms = [
-        idiom
-        for idiom in idioms
-        if idiom not in user_corrects.keys() or user_corrects[idiom]
-    ]
-    idioms = [
-        user_corrects[idiom] if idiom in user_corrects.keys() else idiom
-        for idiom in idioms
-    ]
-
-    all_count = len(changed_words)
-    start_searching_time = time.time()
-    last_search_time = time.time()
-    searched_count = 0
-
-    loop = asyncio.new_event_loop()
-    asyncio.set_event_loop(loop)
-    loop.run_until_complete(async_main(changed_words, fetch_for_first_searching, POOL))
-    loop.close()
-
-    is_searching = False
-
-
-def search_definition_final_threading(all_input_idiom):
-
-    global all_output_idiom, is_searching, last_search_time, searched_count, all_count, start_searching_time, idioms
-
-    is_searching = True
-
-    all_count = len(idioms)
-    start_searching_time = time.time()
-    last_search_time = time.time()
-    searched_count = 0
-
-    loop = asyncio.new_event_loop()
-    asyncio.set_event_loop(loop)
-    all_output_idiom = "\n".join(
-        loop.run_until_complete(async_main(idioms, fetch_for_final_searching, POOL))
-    )
-    loop.close()
-
-    is_searching = []
-
-
-async def fetch_for_final_searching(sem, idiom, session):
-
-    global last_search_time, searched_count, timeouts
-
-    if len(idiom) in banned_nums:
-        output_idiom = idiom + "（请修改此处）"
-    elif idiom in SPECIAL_WORDS.keys():
-        output_idiom = idiom + "：" + SPECIAL_WORDS[idiom]
-    else:
-        url = "https://hanyu.baidu.com/s"
-        params = {"wd": idiom, "ptype": "zici"}
-        headers = {
-            "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.116 Safari/537.36"
-        }
-
-        async with sem:
-            while True:
-                try:
-                    async with session.get(
-                        url, params=params, headers=headers, timeout=30
-                    ) as resp:
-                        idiom_html = await resp.text("utf-8", "ignore")
-                    timeouts = 0
-                    break
-                except:
-                    idiom_html = ""
-                    timeouts += 1
-                    if timeouts == CONTINUOUS_TIMEOUTS_MAX:  # 连续五次超时
-                        tkinter.messagebox.showerror("", "请求超时，请重试，或重启电脑后重试。")
-                        root.destroy()
-
-        if get_def(idiom, idiom_html):
-            output_idiom = idiom + "：" + get_def(idiom, idiom_html)
-        else:
-            output_idiom = idiom + "（请修改此处）"
-
-    try:
-        last_search_time = time.time()
-        searched_count += 1
-        unsearched_count = all_count - searched_count
-        used_time = last_search_time - start_searching_time
-        speed = searched_count / used_time
-        rest_time = unsearched_count / speed
-        progress.set(
-            "预计剩余时间：{}s\n{}\n{}个/s".format(
-                str(int(rest_time)),
-                str(progress_bar(searched_count / all_count, 15)),
-                str(int(speed)),
-            )
-        )
-    except ZeroDivisionError:
-        searched_count += 1
-        progress.set(progress_bar(1, 15))
-
-    return output_idiom
 
 
 def output_definition():
@@ -504,7 +485,7 @@ def output_definition():
 
 if __name__ == "__main__":
 
-    is_searching = True
+    state = "searching"
     disposable_widgets = []
     CONTINUOUS_TIMEOUTS_MAX = 30
     CHECK_INTERVAL = 1
@@ -530,7 +511,7 @@ if __name__ == "__main__":
         root, width=100, height=20, font=("微软雅黑", 10)
     )
     text_box.pack()
-    text_box.bind("<Button-3>", lambda x: right_key(x, text_box))  # 右键菜单
+    text_box.bind("<Button-3>", lambda x: right_key(x, text_box))
 
     var1 = tkinter.IntVar()
     c1 = tkinter.Checkbutton(root, text="查询单个汉字", variable=var1, onvalue=1, offvalue=0)
