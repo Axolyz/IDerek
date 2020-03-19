@@ -106,7 +106,7 @@ def get_def(idiom, idiom_html):
                 bs4.BeautifulSoup(idiom_html, "lxml")
                 .find(name="div", class_="content means imeans", id="basicmean-wrapper")
                 .find(name="div", class_="tab-content")
-                .find_all(name=["p", "dt"])
+                .find_all(name=["p", "dt", "span"])
             )
             passage_texts = pinyins + passage_texts
             a = " ".join(
@@ -125,7 +125,7 @@ def get_def(idiom, idiom_html):
                 bs4.BeautifulSoup(idiom_html, "lxml")
                 .find(name="div", class_="content means imeans", id="basicmean-wrapper")
                 .find(name="div", class_="tab-content")
-                .find_all(name=["p", "dt"])
+                .find_all(name=["p", "dt", "span"])
             )
             a = " ".join(
                 [
