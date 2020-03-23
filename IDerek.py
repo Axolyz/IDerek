@@ -314,9 +314,6 @@ def search_definition_first_time_threading(all_input_idiom):
         if idiom.strip(",").strip("，")
     ]  # 成语文本格式化后转列表
     all_count = len(idioms)
-    start_searching_time = time.time()
-    last_search_time = time.time()
-    searched_count = 0
 
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
@@ -347,9 +344,6 @@ def search_definition_again_threading(all_input_idiom):
     ]
 
     all_count = len(changed_words)
-    start_searching_time = time.time()
-    last_search_time = time.time()
-    searched_count = 0
 
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
@@ -368,9 +362,6 @@ def search_definition_final_threading(all_input_idiom):
     state == "searching"
 
     all_count = len(idioms)
-    start_searching_time = time.time()
-    last_search_time = time.time()
-    searched_count = 0
 
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
@@ -384,7 +375,7 @@ def search_definition_final_threading(all_input_idiom):
 
 def search_definition_gui(function, text):
 
-    global progress, progress_top, banned_nums, corrects, state
+    global progress, progress_top, banned_nums, corrects, state, start_searching_time, last_search_time, searched_count
 
     corrects = {}
     if not var1.get():
@@ -406,6 +397,10 @@ def search_definition_gui(function, text):
     ).pack()
 
     all_input_idiom = text_box.get("0.0", "end").strip()
+
+    start_searching_time = time.time()
+    last_search_time = time.time()
+    searched_count = 0
 
     Thread_1 = threading.Thread(target=function, args=(all_input_idiom,))
     Thread_1.setDaemon(True)
