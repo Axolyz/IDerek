@@ -1,11 +1,20 @@
 <center><img src="https://i.loli.net/2020/03/13/ShB1HLiFNCOAW6u.png"  width="100">
 
 # IDerek（语流）
+
 重新定义成语</center>
 
 ## 功能
 
-IDerek是一个使用Python开发的小应用，包括成语单OCR结果格式化，自动改错，批量查询成语或词语释义等功能。极其业余，大神轻喷。
+IDerek是一个使用Python开发的小应用，支持关于成语处理的各项操作。
+
+- 成语单OCR结果格式化
+
+- 自动改错
+
+- 批量查询成语或词语释义
+
+- 快捷，便利，自动化，一站式
 
 可以查询（包括但不限于）汉字，词语，术语，成语。
 
@@ -68,6 +77,7 @@ xp版是Windows通用的。但是查词逻辑相当落后，不支持自动改�
 真需要的可以issue或者发邮箱，需要的人多再加入。
 
 关于更加详尽的用法，参见项目内使用说明。
+
 ## 作者
 
 - Github：[@This-username-is-available](https://github.com/This-username-is-available)
