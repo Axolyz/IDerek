@@ -1,8 +1,8 @@
-<center><img src="https://i.loli.net/2020/03/13/ShB1HLiFNCOAW6u.png"  width="100">
+<p align="center"><img src="https://i.loli.net/2020/03/13/ShB1HLiFNCOAW6u.png"  width="100">
 
 # IDerek（语流）
 
-重新定义成语</center>
+重新定义成语</p>
 
 ## 功能
 
