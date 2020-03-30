@@ -1,6 +1,6 @@
 <p align="center"><img src="https://i.loli.net/2020/03/13/ShB1HLiFNCOAW6u.png"  width="100"></p>
 
-<h1 align="center">IDerek(语流)</h3>
+<h1 align="center">IDerek(语流)</h1>
 
 <p align="center">重新定义成语</p>
 
