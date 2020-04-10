@@ -2,8 +2,6 @@
 
 <h1 align="center">IDerek(语流)</h1>
 
-<p align="center">重新定义成语</p>
-
 ## 功能
 
 IDerek 是一个使用 Python 开发的小应用，支持关于成语处理的各项操作。
